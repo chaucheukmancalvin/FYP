@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/Profile.css')}}">
+{% endblock %}
+{% block body %}
+<h1>Profile</h1>
+<div class="profile">
+    <p>user ID:{{member[0]}}</p><br>
+    <p>username:{{member[1]}}</p><br>
+    <button onclick="showchangename()">change username</button><br><button onclick="showchangepassword()">change password</button><br>
+   <p>membership:{{member[2]}}</p><br>
+   <p><img src="{{url_for('static', filename='img/profile'+ member[0]|string +'.'+ img|string )}}" alt="member[0]"></p><button onclick="showchangeimg()">change image</button><br>
+    <form action="/changemember_name" method="POST" class="changename">
+        <button onclick="closename()">X</button>
+        <input name="username" placeholder="new username" type="text">
+        <input type="submit" value="change">
+    </form>
+    <br>
+    <form action="/changemember_password" method="POST" class="changepassword">
+        <button onclick="closepassword()">X</button>
+        <input name="old_password" placeholder="old password" type="password">
+        <input name="new_password" placeholder="new password" type="password">
+        <input type="submit" value="change">
+    </form>
+    <br>
+    <form action="/changeprofile_img" method="POST" enctype="multipart/form-data" class="changeimg">
+        <button onclick="closeimg()">X</button>
+        <input name="image" type="file">
+        <input type="submit" value="change">
+    </form>
+</div>
+<script>
+    var x = document.getElementsByClassName("changename");
+    var y = document.getElementsByClassName("changeimg");
+    var z = document.getElementsByClassName("changepassword");
+    function showchangename(){
+        x[0].style.display = "block";
+        y[0].style.display = "none";
+        z[0].style.display = "none";
+    }
+    function showchangeimg(){
+        y[0].style.display = "block";
+        x[0].style.display = "none";
+        z[0].style.display = "none";
+    }
+    function showchangepassword(){
+        z[0].style.display = "block";
+        x[0].style.display = "none";
+        y[0].style.display = "none";
+    }
+    function closename(){
+        x[0].style.display = "none";
+    }
+    function closeimg(){
+        y[0].style.display = "none";
+    }
+    function closepassword(){
+        z[0].style.display = "none";
+    }
+</script>
+{% endblock %}

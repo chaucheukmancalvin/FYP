@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/score.css')}}">
+{% endblock %}
+{% block body %}
+<h1>Membership</h1>
+<button onclick="plusDivs(-1)">&#10094;</button>
+<button onclick="plusDivs(1)">&#10095;</button>
+<div class="membership">
+    <form action="/nomalmembership" method="POST">
+        <input type="text" name="member_name" placeholder="username:">
+        <input type="password" name="password" placeholder="password:">
+        <input type="password" name="confirmpassword" placeholder="confirm password:">
+        <button type="submit">Registor</button>
+    </form>
+    <p>{{message}}</p>
+</div>
+<div class="membership">
+    <form action="/VIPmembership" method="POST">
+        <input type="text" name="member_ID" placeholder="userID:">
+        <input type="password" name="password" placeholder="password:">
+        <input type="password" name="confirmpassword" placeholder="confirm password:">
+        <button type="submit">Upgrade</button>
+    </form>
+    <p>{{mes}}</p>
+</div>
+<script>
+		var slideIndex = 1;
+		showDivs(slideIndex);
+		function plusDivs(n) {
+			showDivs(slideIndex += n);
+		}
+		function showDivs(n) {
+			var i;
+			var x = document.getElementsByClassName("membership");
+			console.log(x, n)
+			if (n > x.length) {slideIndex = 1}
+			if (n < 1) {slideIndex = x.length} ;
+			for (i = 0; i < x.length; i++) {
+				x[i].style.display = "none";
+			}
+			x[slideIndex-1].style.display = "block";
+		}
+
+</script>
+{% endblock %}

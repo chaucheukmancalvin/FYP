@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/contactus.css')}}">
+{% endblock %}
+{% block body %}
+<h1>Contact us</h1>
+{% for i in staff %}
+    <div>
+        {{i[0]}}
+        <p>Telephone: </p>
+        {{i[1]}}
+        <p>Mobile: </p>
+        {{i[2]}}
+        <p>Position: </p>
+        {{i[3]}}
+    </div>
+{% endfor %}
+<p>Salon Working hour</p><br>
+<div>
+    Mon-Fri: 9:00-17:00
+</div>
+<div>
+    Sat-Sun: 11:00-19:00
+</div>
+{% endblock %}

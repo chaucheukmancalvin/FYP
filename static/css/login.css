@@ -1,0 +1,92 @@
+
+.register_button{
+    width:100%;
+    background-color: #f44336;
+    padding: 15px 32px;
+    text-align: center;
+}
+.register_button:hover {
+    background-color: #f44336be;
+}
+.loginform{
+    width:20%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top:80px;
+    margin-bottom:115px;
+    padding: 3vh 0px 10vh 0px;
+    border: solid;
+    border-radius: 10px;
+    text-align: center;
+}
+.loginform > h1{
+    margin-bottom:7vh;
+}
+.loginform > form > input {
+    margin-top:2px;
+    margin-bottom:2px;
+    padding: 3px 3px 3px 3px;
+}
+.loginform > form > input[type=submit]{
+    background-color: #4CAF50;
+    width: 80%;
+}
+.loginform > form > input[type=submit]:hover {
+    background-color: #45a049;
+  }
+  
+  .messages {
+    color: chocolate;
+  }
+
+  .register{
+      background-color: darkgray;
+      display: none;
+  }
+
+  @media screen and (max-width:420px) {
+    .register_button{
+        width:100%;
+        background-color: #f44336;
+        padding: 15px 32px;
+        text-align: center;
+    }
+    .register_button:hover {
+        background-color: #f44336be;
+    }
+    .loginform{
+        width:85%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top:80px;
+        margin-bottom:200px;
+        padding: 3vh 0px 10vh 0px;
+        border: solid;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .loginform > h1{
+        margin-bottom:7vh;
+    }
+    .loginform > form > input {
+        margin-top:2px;
+        margin-bottom:2px;
+        padding: 3px 3px 3px 3px;
+    }
+    .loginform > form > input[type=submit]{
+        background-color: #4CAF50;
+        width: 80%;
+    }
+    .loginform > form > input[type=submit]:hover {
+        background-color: #45a049;
+      }
+      
+      .messages {
+        color: chocolate;
+      }
+    
+      .register{
+          background-color: darkgray;
+          display: none;
+      }
+  }

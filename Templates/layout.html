@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salon advisor</title>
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/layout.css')}}">
+{% block head %}{% endblock %}
+</head>
+<body>
+<nav class="Nav">
+<div class="Navtop">
+    {% if not session['admin'] and not session['staff'] %}
+    <a href="{{url_for('index')}}"><img src="{{url_for('static', filename='img/home.png')}}"></a>
+    {% elif session['admin'] %}
+    <a href="{{url_for('admin')}}"><img src="{{url_for('static', filename='img/home.png')}}"></a>
+    {% else %}
+    <a href="{{url_for('staff')}}"><img src="{{url_for('static', filename='img/home.png')}}"></a>
+    {% endif %}
+</div>
+    <div class="Navmenu">
+    {% if not session['admin'] and not session['staffs'] %}
+    <div>
+        <a href="{{url_for('aboutus')}}">About us</a>
+    </div>
+    <div>
+            <a href="{{url_for('advertisement')}}">Advertisement</a>
+    </div>
+    <div>
+        <a href="{{url_for('booking')}}">booking</a>
+    </div>
+    <div>
+        <a href="{{url_for('contactus')}}">Contact us</a>
+    </div>
+    {% if session['member'] %}
+    <div>
+        <a href="{{url_for('history')}}">History</a>
+    </div>
+    <div>
+        <a href="{{url_for('Profile')}}">Profile</a>
+    </div>
+    <div class="logout">
+        <form action="/logout" method="POST">
+            <input type="submit" value="logout">
+        </form>
+    </div>
+    {% endif %}
+    {% if not session['member'] %}
+    <div>
+        <a href="{{url_for('login')}}">Login</a>       
+    </div>
+    {% endif %}
+    {% elif session['admin'] %}
+    <div>
+        <a href="{{url_for('timetable')}}">timetable</a>
+    </div>
+    <div>
+        <a href="{{url_for('POS')}}">POS</a>
+    </div>
+    <div class="logout">
+        <form action="/adminlogout" method="POST">
+            <input type="submit" value="logout">
+        </form>
+    </div>
+    {% else %}
+    <div>
+        <a href="{{url_for('timetable')}}">timetable</a>
+    </div>
+    <div>
+        <a href="{{url_for('score')}}">score</a>
+    </div>
+    <div>
+        <a href="{{url_for('membership')}}">membership</a>
+    </div>
+    <div>
+        <a href="{{url_for('scoring')}}">scoring</a>
+    </div>
+    <div class="logout">
+        <form action="/stafflogout" method="POST">
+            <input type="submit" value="logout">
+        </form>
+    </div>
+    {% endif %}
+</div>
+</nav>
+{% block body %}
+{% endblock %}
+</body>
+</html>

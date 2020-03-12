@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salon advisor</title>
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/POS.css')}}">
+</head>
+<body>
+<h1>POS</h1>
+{% if not session['POS_service'] %}
+<div class="service">
+    <p>choose a service</p><br>
+    {% for i in range(service_img|length) %}
+    <form action="/POS_service" method="POST">
+    <button  name="service" type="submit" value={{service_img[0][i]}}>
+        {{service_img[0][i]}}
+        <img src="{{url_for('static', filename='img/POS'+ service_img[0][i]|string +'.'+ service_img[1][i]|string )}}" alt={{service_img[1][i]}}>
+    </button>
+    </form>
+    {% endfor %}
+    <br>
+    <form class="cancel" action="/POS_cancel" method="POST"><input type="submit" value="cancel"></form>
+</div>
+{% elif not session['POS_seat'] %}
+<div class="staff">
+    <p>choose a staff</p><br>
+    {% for i in staff %}
+    <form action="/POS_staff" method="POST">
+    <button name="staff" type="submit" value={{i}}>
+        {{i}}
+        <img src="{{url_for('static', filename='img/staff_img'+ i|string + '.jpg')}}">
+    </button>
+    </form>
+    {% endfor %}
+    <br>
+    <form class="cancel" action="/POS_cancel" method="POST"><input type="submit" value="cancel"></form>
+</div>
+{% elif not session['POS_member']%}
+<div class="seat">
+    <p>choose a seat</p><br>
+    {% for i in seat %}
+    <form action="/POS_seat" method="POST">
+    <button  name="seat" type="submit" value={{i}}>
+        {{i}}
+    </button>
+    </form>
+    {% endfor %}
+    <br>
+    <form class="cancel" action="/POS_cancel" method="POST"><input type="submit" value="cancel"></form>
+</div>
+{% elif not session['POS_price']%}
+<div class="member">
+    <p>member</p><br>
+    <form action="/POS_member" method="POST">
+    member ID<input name="member_ID" type="text"><br>
+    member password<input name="member_password" type="password"><br>
+    <input type="submit" value="member" name="submit">
+    <input type="submit" value="skip" name="submit">
+    </form>
+    <br>
+    <form class="cancel" action="/POS_cancel" method="POST"><input type="submit" value="cancel"></form>
+</div>
+{% else %}
+<div class="payment">
+    <p>payment</p><br>
+    <form action="/POS_payment" method="POST">
+        <p>service: {{service}}</p><br>
+        <p>staff: {{staff}}</p><br>
+        <p>seat: {{seat}}</p><br>
+        <p>price: {{price}}</p><br>
+        <input type="radio" name="payment" value="cash">cash<br>
+        <input type="radio" name="payment" value="credit_card">credit card<br>
+        <input type="submit" value="Pay">
+    </form>
+    <form class="cancel" action="/POS_cancel" method="POST"><input type="submit" value="cancel"></form>
+</div>
+{% endif %}
+{% if session['POS_done'] %}
+<div class="done">
+    {{done}}<br>
+    <form action="/POS_cancel" method="POST"><input type="submit" value="Done"></form>
+</div>
+{% endif %}
+</body>
+</html>

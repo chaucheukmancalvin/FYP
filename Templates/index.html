@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{
+ url_for('static', filename='css/index.css')}}">
+ {% endblock %}
+
+{% block body %}
+<h1>Homepage</h1>
+{% if session['member'] %}
+Welcome {{member[0]}}
+	{% if upcome_booking != none %}
+	<h2>Upcoming Booking Date: {{upcome_booking}}</h2>
+	{% endif %}
+{% endif %}
+<p>Latest Hair Cut</p>
+
+<div class="Slide">
+	<img class="mySlides" src="{{url_for('static',filename='img/img1.jpg')}}" >
+	<img class="mySlides" src="{{url_for('static',filename='img/img2.jpg')}}" >
+	<button onclick="plusDivs(-1)">&#10094;</button>
+	<button onclick="plusDivs(1)">&#10095;</button>
+</div>
+<br>
+<p>Different Service</p>
+<div class="service">
+	{% for i in service %}
+	<li>
+		<a>
+			<img src="{{url_for('static', filename='img/service_img'+ i[0]|string +'.jpg')}}" alt="hair service">
+		</a>
+		<div>{{i[0]}}</div>
+		<div class="servicedetails">
+		{% for j in servicedetails %}
+			{% for k,l in j.items() %}
+				{% if i[0]==l %}
+				<p>
+					{{k}}
+				</p>
+				{% endif %}
+			{% endfor %}
+		{% endfor %}
+	</div>
+	</li>
+	{% endfor %}
+</div>
+<br>
+<div>Staff</div>
+<br>
+<div class="staff">
+	{% for i in staff %}
+	<li>
+		<a>
+		<img src="{{url_for('static', filename='img/staff_img'+ i[0]|string + '.jpg')}}">
+		</a>
+		<div>{{i[0]}}</div>
+	</li>
+	{% endfor %}
+</div>
+<br>
+<p>new information of our salon</p>
+<a href="#">facebook</a><br>
+<a href="#">twitter</a>
+<script>
+		var slideIndex = 1;
+		showDivs(slideIndex);
+		function plusDivs(n) {
+			showDivs(slideIndex += n);
+		}
+		function showDivs(n) {
+			var i;
+			var x = document.getElementsByClassName("mySlides");
+			console.log(x, n)
+			if (n > x.length) {slideIndex = 1}
+			if (n < 1) {slideIndex = x.length} ;
+			for (i = 0; i < x.length; i++) {
+				x[i].style.display = "none";
+			}
+			x[slideIndex-1].style.display = "block";
+		}
+
+</script>
+{% endblock %}

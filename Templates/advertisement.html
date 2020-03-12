@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/advertisement.css')}}">
+{% endblock %}
+{% block body %}
+<h1>Advertisement</h1>
+<p>New service developing....</p>
+<div>
+    <p>BasicTint coloring</p><br>
+    <img src="{{url_for('static', filename='img/Tint-color-wheel' + '.jpg')}}"><br>
+    <p>Organic coloring</p><br>
+    <img src="{{url_for('static', filename='img/Pigments_Color_Wheels' + '.jpg')}}"><br>
+    <p>FullHighlights</p><br>
+    <img src="{{url_for('static', filename='img/hair-colors' + '.jpg')}}"><br>
+    <p>Gloss</p><br>
+    <img src="{{url_for('static', filename='img/gloss' + '.jpg')}}"><br>
+</div>
+<div>
+    <p>Manicure&Pedicure</p><br>
+    <img src="{{url_for('static', filename='img/manicure' + '.jpg')}}"><br>
+</div>
+{% endblock %}

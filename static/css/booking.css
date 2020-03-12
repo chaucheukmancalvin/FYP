@@ -1,0 +1,95 @@
+body {
+    background-color: aquamarine;
+}
+
+.bookingform{
+    background-color: salmon;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top:80px;
+    margin-bottom:115px;
+    padding: 3vh 0px 10vh 0px;
+    border: solid;
+    text-align: center;
+}
+.bookingform > form {
+    padding: 10px 10px 10px 10px;
+}
+
+.bookingform > form > select{
+    width:80%;
+    margin-bottom:10px;
+    padding: 10px 10px 10px 10px;
+}
+
+.staff_price, .staff_exp{
+    display: None;
+}
+
+.Next{
+    width: 50%;
+    margin-top:50px;
+    text-align: center;
+    padding: 10px 10px 10px 10px;
+    background-color: lightgreen;
+}
+
+.Last{
+    width: 50%;
+    margin-top:50px;
+    text-align: center;
+    padding: 10px 10px 10px 10px;
+    background-color: rosybrown;
+}
+
+.cancel{
+    width: 30%;
+    text-align: center;
+    padding: 10px 10px 10px 10px;
+    background-color: red;
+}
+.img_duration, .img_price{
+    margin-left: auto;
+    margin-right: auto;
+}
+.img_staff_score, .img_staff_price, .img_staff_exp{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1vw;
+	width: 25vw;
+	height: 40vw;
+	border: solid;
+}
+
+@media screen and (max-width:420px) {
+    body {
+        background-color: aqua;
+    }
+    
+    .bookingform{
+        width: 80%;
+        background-color: salmon;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+        margin-top:80px;
+        margin-bottom:115px;
+        padding: 3vh 0px 10vh 0px;
+        border: solid;
+        border-radius: 10px;
+    }
+    .bookingform > form {
+        padding: 10px 10px 10px 10px;
+    }
+    
+    .bookingform > form > select{
+        width:80%;
+        padding: 10px 10px 10px 10px;
+    }
+    
+    .staff_price, .staff_exp{
+        display: None;
+    }
+    
+}

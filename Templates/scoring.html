@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/scoring.css')}}">
+{% endblock %}
+{% block body %}
+<div>
+    <form action="/scoring_mark" method="POST">
+        <p>In this service between 1-5 marks how many marks you are satisfy with the staff who served you (5 is the best)</p><br>
+        <input name="score" type="radio" value=1>1 mark<br>
+        <input name="score" type="radio" value=2>2 marks<br>
+        <input name="score" type="radio" value=3>3 marks<br>
+        <input name="score" type="radio" value=4>4 marks<br>
+        <input name="score" type="radio" value=5>5 marks<br>
+        <input type="submit" value="Scoring">
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,165 @@
+.calendar {
+    position: fixed;
+    left: 400px;
+    bottom: 30;
+    z-index: 9;
+  }
+  
+  .month {
+    padding: 70px 25px;
+    width: 93%;
+    background: #1abc9c;
+    text-align: center;
+    border: 3px solid #f1f1f1;
+  }
+  
+  .month ul {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .month ul li {
+    color: white;
+    font-size: 20px;
+    list-style: none;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+  
+  .month .prev {
+    float: left;
+    list-style: none;
+    padding-top: 10px;
+  }
+  
+  .prev form button {
+    border: none;
+    background: #1abc9c;
+  }
+
+  .prev form button:hover {
+    background: #037a62;
+  }
+
+  .next form button {
+    border: none;
+    background: #1abc9c;
+  }
+
+  .next form button:hover {
+    background: #037a62;
+  }
+
+  .month .next {
+    float: right;
+    list-style: none;
+    padding-top: 10px;
+  }
+  
+  .weekdays {
+    margin: 0;
+    width: 100%;
+    padding: 10px 0;
+    background-color: #ddd;
+    border: 3px solid #f1f1f1;
+  }
+  
+  .weekdays li {
+    display: inline-block;
+    width: 13.1%;
+    color: #666;
+    text-align: center;
+  }
+  
+  .days {
+    padding: 10px 0;
+    background: #eee;
+    margin: 0;
+    border: 3px solid #f1f1f1;
+  }
+  
+  .days form {
+    list-style-type: none;
+    display: inline-block;
+    width: 13.1%;
+    text-align: center;
+    margin-bottom: 5px;
+    font-size:12px;
+    color: #777;
+  }
+
+  .days form li button{
+    border: none;
+    background: #eee;
+  }
+
+  .days form li button:hover{
+    background: rgb(255, 254, 254);
+  }
+
+  .close{
+      border: none;
+      background: rgb(255, 27, 27);
+      color: white;
+  }
+
+  .timetable{
+    font-family: Roboto;
+  }
+
+  .staff {
+    margin: 0;
+    width: 100%;
+    padding: 10px 0;
+  }
+  
+  .staff li {
+    display: inline-block;
+    width: 11.1%;
+    color: rgb(15, 0, 231);
+    text-align: center;
+    
+  }
+
+  .schedule {
+    padding: 10px 0;
+    background: #eee;
+    margin: 0;
+    border-bottom: 0.5px solid;
+    border-color: rgb(161, 161, 161);
+  }
+  
+  .schedule li {
+    list-style-type: none;
+    display: inline-block;
+    width: 11.1%;
+    text-align: center;
+    margin-bottom: 5px;
+    font-size:12px;
+    color: #777;
+    overflow-x: auto;
+  }
+
+  @media screen and (max-width:720px) {
+    .weekdays li, .days li {width: 13.1%;}
+  }
+  
+  @media screen and (max-width: 420px) {
+    .calendar {
+      position: fixed;
+      left: 0px;
+      bottom: 30;
+      z-index: 9;
+    }
+    .weekdays li, .days li {width: 12.5%;}
+  }
+  
+  @media screen and (max-width: 290px) {
+    .calendar {
+      position: fixed;
+      left: 0px;
+      bottom: 0;
+      z-index: 9;
+    }
+    .weekdays li, .days li {width: 12.2%;}
+  }

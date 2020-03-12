@@ -1,0 +1,27 @@
+.membership{
+    display: none;
+    width:20%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top:80px;
+    margin-bottom:115px;
+    padding: 3vh 0px 10vh 0px;
+    border: solid;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.membership > form > input{
+    margin-top:2px;
+    margin-bottom:2px;
+    padding: 3px 3px 3px 3px;
+}
+
+.membership > form > button{
+    background-color: #4CAF50;
+    width: 80%;
+}
+
+.membership > p{
+    color: red;
+}

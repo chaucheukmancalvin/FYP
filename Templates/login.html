@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/login.css')}}">
+{% endblock %}
+{% block body %}
+<div class="loginform">
+    <h1>Login</h1><br>
+    <form action="/loginFunction" method="POST">
+        userid:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" name="userid"><br>
+        <br>
+        password: <input type="password" name="password"><br>
+        <br>
+        <input type="submit" value="Login">
+    </form>
+</div>
+{% if session['messages'] %}
+<p class="messages">{{ messages['main'] }}</p>
+{% endif %}
+<button onclick="showRegister()" class="register_button">register requirement</button>
+<div class="register">
+    Purchase for more than $200 in one time can become a nomal member and will have 5% off<br>
+    Nomal members can upgrade to VIP member by patronize 10 time or above<br>
+    VIP members will have 10% off<br>
+    No time limit for any membership<br>
+    lets go try our service and become our member.
+</div>
+<script>
+    var x = document.getElementsByClassName("register");
+	function showRegister() {
+        console.log(x)
+		if (x[0].style.display != "block") {
+            console.log(x)
+            x[0].style.display = "block"
+        }
+        else if (x[0].style.display != "none") {
+            console.log(x)
+            x[0].style.display = "none"
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/timetable.css')}}">
+{% endblock %}
+{% block body %}
+<h1>timetable</h1>
+<button onclick="showcal()">calendar</button>
+<div class="calendar">
+<button class="close" onclick="closecal()">X</button>
+<div class="month">    
+    <ul>
+        <li class="prev"><form action="/prevmonth" method="POST"><button type="submit">&#10094;</button></form></li>
+        <li class="next"><form action="/nextmonth" method="POST"><button type="submit">&#10095;</button></form></li>
+        <li>
+        {{month}}<br>
+        <span style="font-size:18px">{{year}}</span>
+        </li>
+    </ul>
+</div>
+      <ul class="weekdays">
+        <li>Mon</li>
+        <li>Tue</li>
+        <li>Wed</li>
+        <li>Thu</li>
+        <li>Fri</li>
+        <li>Sat</li>
+        <li>Sun</li>
+      </ul>
+      <ul class="days">
+        {% for i in days %}
+        <form action="/selectdate" method="POST">
+        <li><button type="submit" value="{{i}}" name="day">{{i}}</button></li>
+        </form>
+        {% endfor %}
+      </ul>
+</div>
+<div class="timetable">
+    {{date_selected}}
+        <ul class="staff">
+            <li>
+                time
+            </li>
+            {% for i in staff %}
+            <li>
+                {{i[0]}}
+            </li>
+            {% endfor %}
+        </ul>
+        {% for i in time %}
+        <ul class="schedule">
+            <li>
+                {{i[0]}}
+            </li>
+            {% for j in i[1] %}
+            <li>
+                {{j}}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endfor %}
+</div>
+<script>
+function showcal() {
+  document.getElementsByClassName("calendar")[0].style.display = "block";
+}
+function closecal() {
+  document.getElementsByClassName("calendar")[0].style.display = "none";
+}
+</script>
+{% endblock %}

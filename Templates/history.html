@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/history.css')}}">
+{% endblock %}
+{% block body %}
+<h1>History</h1>
+<div class="history">
+<table>
+    <tr>
+        <th style="width:20%;">Service</th>
+        <th style="width:20%;">Staff</th>
+        <th style="width:20%;">Date&Time</th>
+        <th style="width:20%;">Seat</th>
+        <th style="width:20%;">Score</th>
+        <th style="width:20%;">Cancel</th>
+    </tr>
+    <tbody>
+    {% for i in table %}
+    <tr>
+        <td>{{ i[0] }}</td>
+        <td>{{ i[1] }}</td>
+        <td>{{ i[2] }}</td>
+        <td>{{ i[3] }}</td>
+        <td>{{ i[4] }}</td>
+        {% if today < i[2] %}
+        <td><form action="/historycancel" method="POST"><button type="submit" value="{{(i[2],i[3])}}" name="cancel">cancel</button></form></td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

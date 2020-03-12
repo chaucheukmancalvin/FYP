@@ -1,0 +1,336 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/booking.css')}}">
+{% endblock %}
+{% block body %}
+    <h1>Booking page</h1>
+    <div class="bookingform">
+        <p>{{message}}</p><br>
+        {% if not session['service'] %}
+        <p>Choose a service</p>
+        <button onclick="showDuration()">sort by duration</button>
+        <button onclick="showservicePrice()">sort by price</button>
+        <form action="/bookingservice_duration" method="POST" class="service_duration">
+            <select name="service_duration" id="service_duration" onchange="changeimg_duration()">
+                {% for i in service_duration %}
+                <option value={{i[0]}}>{{i[0]}} duration:{{i[1]}}</option>
+                {% endfor %}
+            </select>
+            {% for i in service_duration %}
+            <img class="img_duration" src="{{url_for('static', filename='img/service_img'+ i[0]|string +'.png')}}" alt="{{i[0]}}">
+            {% endfor %}
+            <br>
+            <input type="submit" value="Next" class="Next">
+        </form>
+        <form action="/bookingservice_price" method="POST" class="service_price">
+            <select name="service_price" id="service_price" onchange="changeimg_price()">
+                {% for i in service_price %}
+                <option value={{i[0]}}>{{i[0]}} price:{{i[1]}}</option>
+                {% endfor %}
+            </select>
+            {% for i in service_price %}
+            <img class="img_price" src="{{url_for('static', filename='img/service_img'+ i[0]|string +'.png')}}" alt={{i[0]}}>
+            {% endfor %}
+            <br>
+            <input type="submit" value="Next" class="Next">
+        </form>
+        <form action="/bookingcancel" method="POST">
+            <input type="submit" value="cancel" class="cancel">
+        </form>
+        <script>
+             var a = document.getElementsByClassName("service_duration");
+             console.log(document.getElementsByClassName("service_duration"))
+             var b = document.getElementsByClassName("service_price");
+             showDuration();
+             function showDuration() {
+                a[0].style.display = "block";
+                b[0].style.display = "none";
+                changeimg_duration();
+            }
+            function showservicePrice() {
+                b[0].style.display = "block";
+                a[0].style.display = "none";
+                changeimg_price();
+            }
+            function changeimg_duration(){
+                var x = document.getElementById("service_duration");
+                var xv = x.options[x.selectedIndex].value
+                var z = document.getElementsByClassName("img_duration");
+                for(i=0; i < z.length; i++){
+                    var y = z[i].alt
+                    z[i].style.display = "none";
+                    console.log(y);
+                    if (xv == y){
+                        z[i].style.display = "block";
+                    }
+                }
+             }
+             function changeimg_price(){
+                var x = document.getElementById("service_price");
+                var xv = x.options[x.selectedIndex].value
+                var z = document.getElementsByClassName("img_price");
+                for(i=0; i < z.length; i++){
+                    var y = z[i].alt
+                    z[i].style.display = "none";
+                    console.log(y);
+                    if (xv == y){
+                        z[i].style.display = "block";
+                    }
+                }
+             }
+        </script>
+        {% elif not session['staff'] %}
+        <p>service:{{service}}</p><br>
+        <p>Choose a staff</p>
+        <button onclick="showScore()">sort by score</button>
+        <button onclick="showPrice()">sort by price</button>
+        <button onclick="showExp()">sort by experience</button>
+        <form action="/bookingstaff_score" method="POST" class="staff_score">
+            <select name="staff_score" id="staff_score" onchange="changeimgstaff_score()">
+                {% for i in staff_score %}
+                <option value={{i[0]}}>{{i[0]}}  {{i[2]}}marks</option>
+                {% endfor %}
+            </select>
+            {% for i in staff_score %}
+            <img class="img_staff_score" src="{{url_for('static', filename='img/staff_img'+ i[0]|string + '.jpg')}}">
+            {% endfor %}
+            <input type="submit" value="Next" class="Next">
+        </form>
+        <form action="/bookingstaff_price" method="POST" class="staff_price">
+            <select name="staff_price" id="staff_price" onchange="changeimgstaff_price()">
+                {% for i in staff_price %}
+                <option value={{i[0]}}>{{i[0]}}  ${{i[2]}}extra fee</option>
+                {% endfor %}
+            </select>
+            {% for i in staff_price %}
+            <img class="img_staff_price" src="{{url_for('static', filename='img/staff_img'+ i[0]|string + '.jpg')}}">
+            {% endfor %}
+            <input type="submit" value="Next" class="Next">
+        </form>
+        <form action="/bookingstaff_exp" method="POST" class="staff_exp">
+            <select name="staff_exp" id="staff_exp" onchange="changeimgstaff_exp()">
+                {% for i in staff_exp %}
+                <option value={{i[0]}}>{{i[0]}}  {{i[1]}}times worked</option>
+                {% endfor %}
+            </select>
+            {% for i in staff_exp %}
+            <img class="img_staff_exp" src="{{url_for('static', filename='img/staff_img'+ i[0]|string + '.jpg')}}">
+            {% endfor %}
+            <input type="submit" value="Next" class="Next">
+        </form>
+        <form action="/bookingcancel" method="POST">
+            <input type="submit" value="cancel" class="cancel">
+        </form>
+        <script>
+            var x = document.getElementsByClassName("staff_score");
+            var y = document.getElementsByClassName("staff_price");
+            var z = document.getElementsByClassName("staff_exp");
+            var b = {{ staff_score|tojson }};
+            var c = {{ staff_price|tojson }};
+            var d = {{ staff_exp|tojson }};
+            showScore();
+            window.onload = function(){
+                for (i=0; i < b.length; i++){
+                    document.getElementsByClassName("img_staff_score")[i].value = staff_score[i];
+                    }
+                for (i=0; i < c.length; i++){
+                    document.getElementsByClassName("img_staff_price")[i].value = staff_price[i];
+                }
+                for (i=0; i < d.length; i++){
+                    document.getElementsByClassName("img_staff_exp")[i].value = staff_exp[i];
+                } 
+             }
+            function showScore() {
+                x[0].style.display = "block";
+                y[0].style.display = "none";
+                z[0].style.display = "none";
+                changeimgstaff_score();
+            }
+            function showPrice() {
+                x[0].style.display = "none";
+                y[0].style.display = "block";
+                z[0].style.display = "none";
+                changeimgstaff_price();
+            }
+            function showExp() {
+                x[0].style.display = "none";
+                y[0].style.display = "none";
+                z[0].style.display = "block";
+                changeimgstaff_exp();
+            }
+            function changeimgstaff_score(){
+               var a = document.getElementById("staff_score");
+               var av = a.options[a.selectedIndex].value;
+               var e = document.getElementsByClassName("img_staff_score");
+                for (i=0; i < b.length; i++){
+                    e[i].style.display = "none"
+                    if(av==b[i][0]){
+                        e[i].style.display = "block"
+                    }
+                }
+            }
+            function changeimgstaff_price(){
+               var a = document.getElementById("staff_price");
+               var av = a.options[a.selectedIndex].value;
+               var e = document.getElementsByClassName("img_staff_price");
+                for (i=0; i < c.length; i++){
+                    e[i].style.display = "none"
+                    if(av==c[i][0]){
+                        e[i].style.display = "block"
+                    }
+                }
+            }
+            function changeimgstaff_exp(){
+               var a = document.getElementById("staff_exp");
+               var av = a.options[a.selectedIndex].value;
+               var e = document.getElementsByClassName("img_staff_exp");
+                for (i=0; i < d.length; i++){
+                    e[i].style.display = "none"
+                    if(av==d[i][0]){
+                        e[i].style.display = "block"
+                    }
+                }
+            }
+        </script>
+        {% elif not session['date'] %}          
+        <p>service:{{service}}</p>
+        <p>staff:{{staff}}</p>
+        <p>Choose a date</p>
+        <form action="/bookingdate" method="POST">
+            year:
+            <select name="year">
+                {% for i in year %}
+                <option value={{i}} class="yearv">{{i}}</option>
+                {% endfor %} 
+            </select>
+            <br>
+            month:
+            <select id="month" name="month" onchange="changeday()">
+                {% for i in month %}
+                <option class="monthv"></option>
+                {% endfor %}
+            </select>
+            <br>
+            day:
+            <select name="day">
+                {% for i in day %}
+                <option value={{i}} class="dayv">{{i}}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <input type="submit" value="Next" class="Next">
+        </form>
+        <form action="/bookingcancel" method="POST">
+            <input type="submit" value="cancel" class="cancel">
+        </form>
+        <script>
+            window.onload = function(){
+            var month = {{ month|tojson }};
+                for (i=0; i < month.length; i++){
+                    document.getElementsByClassName("monthv")[i].text = month[i];
+                    document.getElementsByClassName("monthv")[i].value = month[i];
+                    console.log(document.getElementsByClassName("monthv")[i].value)
+                    }
+            }
+            function changeday() {
+                var x = document.getElementsByClassName("year");
+                var y = document.getElementById("month");
+                var yselected = y.options[y.selectedIndex].text;
+                var yselect = {{ month|tojson }};
+                var z = document.getElementsByClassName("day");
+                var xv = document.getElementsByClassName("yearv");
+                var yv = document.getElementsByClassName("monthv");
+                var zv = document.getElementsByClassName("dayv");
+                console.log(yselected)
+                if (yselected == yselect[3] || yselected == yselect[5] || yselected == yselect[8] || yselected == yselect[10]){
+                    console.log(yselect)
+                    for (i = 0; i < 30 ; i++) {
+				        zv[i].style.display = "block";
+                        console.log(i)
+			        }
+                    for (i = 30; i >= 30 ; i++) {
+				        zv[i].style.display = "none";
+                        console.log(i)
+			        }
+                }
+                if (yselected == yselect[1]){
+                    for (i = 0; i < 29 ; i++) {
+				        zv[i].style.display = "block";
+                        console.log(i)
+			        }
+                    for (i = 29; i >= 29 ; i++) {
+				        zv[i].style.display = "none";
+                        console.log(i)
+			        }
+                }
+                if (yselected == yselect[0] || yselected == yselect[2] || yselected == yselect[4] || yselected == yselect[6] || yselected == yselect[7] || yselected == yselect[9] || yselected == yselect[11]){
+                    for (i = 0; i < 31 ; i++) {
+				        zv[i].style.display = "block";
+                        console.log(i)
+			        }
+                }
+            }
+        </script>
+        {% elif not session['time'] %}
+        <p>service:{{service}}</p>
+        <p>staff:{{staff}}</p>
+        <p>date:{{date}}</p>
+        <p>Choose a time</p>
+        <form action="/bookingtime" method="POST">
+            hour:
+            <select name="hour">
+                {% for i in hour %}
+                <option value={{i}}>{{i}}</option>
+                {% endfor %} 
+            </select>
+            <br>
+            minute:
+            <select name="minute">
+                {% for i in minute %}
+                <option value={{i}}>{{i}}</option>
+                {% endfor %} 
+            </select>
+            <br>
+            <input type="submit" value="Next" class="Next">
+        </form>
+        <form action="/bookingcancel" method="POST">
+            <input type="submit" value="cancel" class="cancel">
+        </form>
+        {% elif not session['seat'] %}
+        <p>service:{{service}}</p>
+        <p>staff:{{staff}}</p>
+        <p>date:{{date}}</p>
+        <p>time:{{time}}</p>
+        <p>Choose a seat</p>
+        <form action="/bookingseat" method="POST">
+            <select name="seat">
+                {% for i in seat %}
+                <option value={{i}}>{{i}}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Next" class="Next">
+        </form>
+        <form action="/bookingcancel" method="POST">
+            <input type="submit" value="cancel" class="cancel">
+        </form>
+        {% elif not session['success'] %}
+        <form action="/bookingFunction" method="POST">
+            <h1>service:{{ service }}</h1>
+            <h1>staff:{{ staff }}</h1>
+            <h1>date:{{ date }}</h1>
+            <h1>time:{{ time }}</h1>
+            <h1>seat:{{ seat }}</h1>
+            <h1>total price:{{ price }}</h1>
+            <input type="submit" value="Book" class="Last">
+        </form>
+        <form action="/bookingcancel" method="POST">
+            <input type="submit" value="cancel" class="cancel">
+        </form>
+        {% else %}
+        <p>{{ success }}</p>
+        {% endif %}
+    </div>
+    
+{% endblock %}
+    
+
