@@ -54,10 +54,11 @@
 }
 
 .logout > form > input {
-    background-color: green;
-    border: solid;
+    background-color: #607D8B;
+    border: none;
+    color: white;
 }
 
 .logout > form > input:hover {
-    background-color: greenyellow;
+    color: red;
 }

@@ -1,13 +1,18 @@
 {% extends "layout.html" %}
 {% block head %}
 <link rel="stylesheet" href="{{
-    url_for('static', filename='css/score.css')}}">
+    url_for('static', filename='css/membership.css')}}">
 {% endblock %}
 {% block body %}
 <h1>Membership</h1>
+<div class="change">
+	<p>change Form</p>
 <button onclick="plusDivs(-1)">&#10094;</button>
 <button onclick="plusDivs(1)">&#10095;</button>
+</div>
 <div class="membership">
+	<h2>Registor For nomal member</h2>
+	<br>
     <form action="/nomalmembership" method="POST">
         <input type="text" name="member_name" placeholder="username:">
         <input type="password" name="password" placeholder="password:">
@@ -17,7 +22,8 @@
     <p>{{message}}</p>
 </div>
 <div class="membership">
-    <form action="/VIPmembership" method="POST">
+	<form action="/VIPmembership" method="POST">
+		<h2>Upgrade From nomal member to VIP member</h2>
         <input type="text" name="member_ID" placeholder="userID:">
         <input type="password" name="password" placeholder="password:">
         <input type="password" name="confirmpassword" placeholder="confirm password:">

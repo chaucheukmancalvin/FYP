@@ -4,6 +4,13 @@
     url_for('static', filename='css/login.css')}}">
 {% endblock %}
 {% block body %}
+<div class="register">
+    Purchase for more than $200 in one time can become a nomal member and will have 5% off<br>
+    Nomal members can upgrade to VIP member by patronize 10 time or above<br>
+    VIP members will have 10% off<br>
+    No time limit for any membership<br>
+    lets go try our service and become our member.
+</div>
 <div class="loginform">
     <h1>Login</h1><br>
     <form action="/loginFunction" method="POST">
@@ -18,13 +25,6 @@
 <p class="messages">{{ messages['main'] }}</p>
 {% endif %}
 <button onclick="showRegister()" class="register_button">register requirement</button>
-<div class="register">
-    Purchase for more than $200 in one time can become a nomal member and will have 5% off<br>
-    Nomal members can upgrade to VIP member by patronize 10 time or above<br>
-    VIP members will have 10% off<br>
-    No time limit for any membership<br>
-    lets go try our service and become our member.
-</div>
 <script>
     var x = document.getElementsByClassName("register");
 	function showRegister() {

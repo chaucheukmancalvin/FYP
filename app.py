@@ -668,7 +668,12 @@ def historycancel():
 
 @app.route("/staff")
 def staff():
-    return render_template('staff.html')
+    staff_ID=session['staffs']
+    sql="SELECT staff_name, staff_ID FROM staff WHERE staff_ID='%s'"%staff_ID
+    cursor.execute(sql)
+    staffs=cursor.fetchone()
+    staff=staffs[0]
+    return render_template('staff.html',staff=staff)
 
 @app.route("/stafflogout", methods=['POST'])
 def stafflogout():
@@ -818,8 +823,7 @@ def POS():
         except:
             try:
                 seat = request.args['seat']
-                member=session['POS_member']
-                price = session['POS_price']
+                member = session['POS_member']
                 seat = session['POS_seat']
                 staff = session['POS_staff']
                 service = session['POS_service']
@@ -831,7 +835,7 @@ def POS():
                     return render_template('POS.html', service=service, staff=staff, seat=seat)
             except:
                 try:
-                    staff=request.args['staff']
+                    staff = request.args['staff']
                     seat = session['POS_seat']
                     staff = session['POS_staff']
                     service = session['POS_service']
@@ -903,7 +907,7 @@ def POS_service():
     busy=[]
     week= now.strftime('%a').upper()
     print(week)
-    sql="SELECT a.staff_name, b.week FROM staff a, working_week b WHERE a.staff_ID=b.staff and b.week='%s'"%week
+    sql="SELECT a.staff_name, b.week, c.service, d.service_name FROM staff a, working_week b, score c, service d WHERE a.staff_ID=b.staff and b.week='%s' and c.staff=a.staff_ID and c.service=d.service_ID and d.service_name='%s'"%(week,service)
     cursor.execute(sql)
     result1=cursor.fetchall()
     print(result1)
@@ -940,18 +944,13 @@ def POS_staff():
     sql="SELECT b.seat, b.booking_time, a.duration FROM service a, timetable b WHERE a.service_ID=b.service"
     cursor.execute(sql)
     result=cursor.fetchall()
-    sql="SELECT seat_ID FROM seat"
+    sql="SELECT * FROM seat"
     cursor.execute(sql)
     result1=cursor.fetchall()
     busy=[]
     seat=[]
     for k in result1:
-        add_seat="Y"
-        for j in busy:
-            if j == k[0]:
-                    add_seat="N"
-            if add_seat == "Y":
-                seat.append(k[0])
+        seat.append(k[0])
     for i in result:
         if timedelta(hours=int(datetime.strftime(datetime.strptime(str(i[1]), '%Y-%m-%d %H:%M:%S'),'%H')), minutes=int(datetime.strftime(datetime.strptime(str(i[1]), '%Y-%m-%d %H:%M:%S'),'%M')))+timedelta(hours=int(datetime.strftime(datetime.strptime(str(i[2]), '%H:%M:%S'),'%H')), minutes=int(datetime.strftime(datetime.strptime(str(i[2]), '%H:%M:%S'),'%M'))) > timedelta(hours=int(datetime.strftime(now, '%H')), minutes=int(datetime.strftime(now, '%M'))) >= timedelta(hours=int(datetime.strftime(datetime.strptime(str(i[1]), '%Y-%m-%d %H:%M:%S'),'%H')), minutes=int(datetime.strftime(datetime.strptime(str(i[1]), '%Y-%m-%d %H:%M:%S'),'%M'))):
             add_busy="Y"
@@ -964,6 +963,7 @@ def POS_staff():
         for j in busy:
             if j==i:
                 seat.remove(i)
+    print(seat)
     session['POS_seat']=seat
     session['POS_staff']=staff
     return redirect(url_for('POS', staff=staff))
@@ -981,7 +981,7 @@ def POS_member():
     member_ID = request.form['member_ID']
     member_password = request.form['member_password']
     submit = request.form['submit']
-    sql="SELECT a.member_ID, a.member_password, b.discount FROM member a, membership b WHERE a.membership=b.membership_ID"
+    sql="SELECT a.member_ID, a.password, b.discount FROM member a, membership b WHERE a.membership=b.membership_ID"
     cursor.execute(sql)
     member=cursor.fetchall()
     if submit == "member":
@@ -1007,10 +1007,13 @@ def POS_member():
         staff=session['POS_staff']
         service=session['POS_service']
         now=datetime.now()
-        sql="SELECT a.price, c.price, b.seat FROM service a, timetable b, staff c WHERE a.service_ID=b.service and c.staff_ID=b.staff and a.service_name='%s' and a.staff_name='%s'"%(service,staff)
+        sql="SELECT price, service_ID FROM service WHERE service_name='%s'"%service
         cursor.execute(sql)
         result=cursor.fetchone()
-        price=result[0] +result[1]
+        sql="SELECT price, staff_ID FROM staff WHERE staff_name='%s'"%staff
+        cursor.execute(sql)
+        result1=cursor.fetchone()
+        price=result[0] +result1[0]
         session['POS_price']=price
         return redirect(url_for('POS',member_ID=member_ID))
 
@@ -1021,21 +1024,21 @@ def POS_payment():
     staff = session['POS_staff']
     service = session['POS_service']
     member=session['POS_member']
-    sql="SELECT service_ID FROM service WHERE service_name='%s'"%service
+    sql="SELECT service_ID, service_name FROM service WHERE service_name='%s'"%service
     cursor.execute(sql)
     service_name=cursor.fetchone()
-    sql="SELECT staff_ID FROM staff WHERE staff_name='%s'"%staff
+    sql="SELECT staff_ID, staff_name FROM staff WHERE staff_name='%s'"%staff
     cursor.execute(sql)
     staff_name=cursor.fetchone()
     now=datetime.now()
     if member == "Y":
-        sql="INSERT INTO timetable (service, staff, booking_time, seat) VALUES ('%s','%s','%s','%s')"%(service[0],staff[0],now,seat)
+        sql="INSERT INTO timetable (service, staff, booking_time, seat) VALUES ('%s','%s','%s','%s')"%(service_name[0],staff_name[0],now,seat)
         cursor.execute(sql)
         db.commit()
         done="done"
         return redirect(url_for('POS',payment=payment))
     else:
-        sql="INSERT INTO timetable (service, staff, booking_time, seat, member) VALUES ('%s','%s','%s','%s','%s')"%(service[0],staff[0],now,seat,member)
+        sql="INSERT INTO timetable (service, staff, booking_time, seat, member) VALUES ('%s','%s','%s','%s','%s')"%(service_name[0],staff_name[0],now,seat,member)
         cursor.execute(sql)
         db.commit()
         done="done"

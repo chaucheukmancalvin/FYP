@@ -96,17 +96,7 @@ z-index: 1;
 @media screen and (max-width:420px) {
     body{
 		height: 96vh;
-		background: -webkit-linear-gradient(rgb(227, 247, 46),rgb(163, 192, 204));
-		background: -o-linear-gradient(rgb(227, 247, 46),rgb(163, 192, 204));
-		background: -moz-linear-gradient(rgb(227, 247, 46),rgb(163, 192, 204));
-		background: linear-gradient(rgb(227, 247, 46),rgb(163, 192, 204));
 	}
-	h1 {text-align: center;	
-		font-size: 50px;
-		background: -webkit-linear-gradient(aqua,rgb(163, 192, 204));
-		background: -o-linear-gradient(aqua,rgb(163, 192, 204));
-		background: -moz-linear-gradient(aqua,rgb(163, 192, 204));
-		background: linear-gradient(aqua,rgb(163, 192, 204));}
 	
 	.Slide{
 		height: 30vh;
@@ -133,51 +123,31 @@ z-index: 1;
 		width: 80%;
 		margin-left: auto;
 		margin-right: auto;
+		margin-bottom: 15px;
 	}
 	.service > li {
-		float: left;
-		margin-left: 10px;
+		margin-left: 23px;
+		font-size: 12px;
 	}
 	
 	.service > li > a > img{
 		margin-top: 1vw;
-		width: 10vw;
+		width: 12vw;
 		height: 10vw;
-		border: solid;
-	}
-	.service > li > div{
-		text-align: center;
 	}
 	
 	.staff{
 		width: 80%;
 		height: 30vh;
-		margin-left: auto;
-		margin-right: auto;
 	}
-	.staff >li{
-		float: left;
-	}
+
 	.staff > li > a >img {
 		margin-top: 1vw;
 		width: 10vw;
 		height: 15vw;
-		border: solid;
-	}
-	.staff >li >div {
-		text-align: center;
 	}
 	.servicedetails {
-	display: none;
-	position: absolute;
-	background-color: #f9f9f9;
-	min-width: 160px;
-	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-	padding: 12px 16px;
-	z-index: 1;
+	min-width: 50px;
 	}
 	
-	.service > li:hover .servicedetails {
-		display:block;
-	}
 }

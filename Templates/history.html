@@ -6,6 +6,7 @@
 {% block body %}
 <h1>History</h1>
 <div class="history">
+<p>search:<input type="text" id="search" onkeyup="search()"></p>
 <table>
     <tr>
         <th style="width:20%;">Service</th>
@@ -15,7 +16,7 @@
         <th style="width:20%;">Score</th>
         <th style="width:20%;">Cancel</th>
     </tr>
-    <tbody>
+    <tbody id="time_table">
     {% for i in table %}
     <tr>
         <td>{{ i[0] }}</td>
@@ -31,4 +32,22 @@
     </tbody>
 </table>
 </div>
+<script>
+    var x = document.getElementById("time_table");
+    var z = x.getElementsByTagName("tr");
+    var y =document.getElementById("search");
+    function search(){
+        for(i = 0; i < z.length; i++){
+            if(z[i].textContent.includes(y.value)!=true){
+                z[i].style.display="none";
+                console.log(z[i].textContent.includes(y.value))
+            }
+            else{
+                z[i].style.display="table-row";
+            }
+        }
+    }
+    
+    
+</script>
 {% endblock %}

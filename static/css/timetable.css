@@ -11,6 +11,7 @@
     background: #1abc9c;
     text-align: center;
     border: 3px solid #f1f1f1;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   }
   
   .month ul {
@@ -62,6 +63,7 @@
     padding: 10px 0;
     background-color: #ddd;
     border: 3px solid #f1f1f1;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   }
   
   .weekdays li {
@@ -76,6 +78,7 @@
     background: #eee;
     margin: 0;
     border: 3px solid #f1f1f1;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   }
   
   .days form {
@@ -98,9 +101,13 @@
   }
 
   .close{
-      border: none;
-      background: rgb(255, 27, 27);
+      border: solid;
+      background: red;
       color: white;
+  }
+
+  .close:hover{
+    background: rgb(255, 140, 140);
   }
 
   .timetable{

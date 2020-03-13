@@ -1,7 +1,8 @@
 .done {
-    z-index: 9;
+    z-index: 1;
     height: 100%;
     width: 100%;
+    position: fixed;
 }
 
 .cancel input{
@@ -15,7 +16,7 @@ div form {
     display: inline;
 }
 
-.service form button img{
+.service form button img, .staff form button img, .seat img{
     height: 30vw;
     width: 30vw;
 }
@@ -28,6 +29,11 @@ div {
 
 div button{
     background-color: white;
-    border: solid;
+    border: wheat;
     margin-bottom: 10px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+div button:hover{
+    border: solid;
 }

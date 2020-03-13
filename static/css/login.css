@@ -18,6 +18,7 @@
     border: solid;
     border-radius: 10px;
     text-align: center;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
 .loginform > h1{
     margin-bottom:7vh;
@@ -42,6 +43,11 @@
   .register{
       background-color: darkgray;
       display: none;
+      z-index: 1;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      position: fixed;
+      top: 30%;
+      left: 30%;
   }
 
   @media screen and (max-width:420px) {
@@ -59,7 +65,7 @@
         margin-left: auto;
         margin-right: auto;
         margin-top:80px;
-        margin-bottom:200px;
+        margin-bottom:150px;
         padding: 3vh 0px 10vh 0px;
         border: solid;
         border-radius: 10px;
@@ -73,20 +79,10 @@
         margin-bottom:2px;
         padding: 3px 3px 3px 3px;
     }
-    .loginform > form > input[type=submit]{
-        background-color: #4CAF50;
-        width: 80%;
+
+    .register{
+        position: fixed;
+        top: 35%;
+        left: 0%;
     }
-    .loginform > form > input[type=submit]:hover {
-        background-color: #45a049;
-      }
-      
-      .messages {
-        color: chocolate;
-      }
-    
-      .register{
-          background-color: darkgray;
-          display: none;
-      }
   }
