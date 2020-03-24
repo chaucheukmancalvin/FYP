@@ -15,6 +15,7 @@
         <th style="width:20%;">Seat</th>
         <th style="width:20%;">Score</th>
         <th style="width:20%;">Cancel</th>
+        <th style="width:20%">change score</th>
     </tr>
     <tbody id="time_table">
     {% for i in table %}
@@ -29,7 +30,31 @@
         <form action="/historycancel" method="POST"><button type="submit" value="{{(i[2],i[3])}}" name="cancel">cancel</button></form>
         {% endif %}
         </td>
+        <td>
+        {% if today >= i[2] %}
+            <button class="changescore" onclick="showscoring( {{ loop.index-1 }} )">change score</button>
+        {% endif %}
+        </td>
     </tr>
+    <div class="scoring">
+        <button class="closescoring" onclick="closescoring({{ loop.index-1 }})">X</button>
+        <form action="/scoring_mark" method="POST">
+            <h1>In this service between 1-5 marks how many marks you are satisfy with the staff who served you (5 is the best)</h1><br>
+            <p>service: {{ i[0] }}</p><br>
+            <p>staff: {{ i[1] }}</p><br>
+            <p>date&time : {{ i[2] }}</p><br>
+            <p>seat: {{i[3]}}</p><br>
+            <input name="service" type="hidden" value="{{ i[0] }}">
+            <input name="staff" type="hidden" value="{{ i[1] }}"> 
+            <input name="date" type="hidden" value="{{ i[2] }}">
+            <input name="score" type="radio" value=1>1 mark<br>
+            <input name="score" type="radio" value=2>2 marks<br>
+            <input name="score" type="radio" value=3>3 marks<br>
+            <input name="score" type="radio" value=4>4 marks<br>
+            <input name="score" type="radio" value=5>5 marks<br>
+            <input type="submit" value="Scoring">
+        </form>
+    </div>
     {% endfor %}
     </tbody>
 </table>
@@ -38,6 +63,7 @@
     var x = document.getElementById("time_table");
     var z = x.getElementsByTagName("tr");
     var y =document.getElementById("search");
+    var w = document.getElementsByClassName("scoring");
     function search(){
         for(i = 0; i < z.length; i++){
             if(z[i].textContent.includes(y.value)!=true){
@@ -48,6 +74,12 @@
                 z[i].style.display="table-row";
             }
         }
+    }
+    function showscoring(n){
+            w[n].style.display = "block"
+        }
+    function closescoring(n){
+        w[n].style.display = "none"
     }
     
     

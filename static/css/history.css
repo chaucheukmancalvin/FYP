@@ -4,3 +4,56 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+.scoring{
+    display: none;
+    position: fixed;
+    top: 10%;
+    left: 0%;
+    text-align: center;
+    border: solid;
+    border-radius: 10px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 3vh 0px 10vh 0px;
+    z-index: 1;
+    background-color: floralwhite;
+}
+
+.scoring h1 {
+    margin-bottom:7vh;
+}
+
+.scoring form input{
+    margin-top:2px;
+    margin-bottom:2px;
+    padding: 3px 3px 3px 3px;
+}
+.scoring  form  input[type=submit]{
+    background-color: #4CAF50;
+    width: 80%;
+}
+.scoring  form  input[type=submit]:hover {
+    background-color: #45a049;
+  }
+
+.changescore{
+    border: none;
+}
+
+.changescore:hover{
+    background-color: floralwhite;
+    color: red;
+}
+
+.closescoring{
+    float: left;
+    border: none;
+    width: 3%;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    background-color: red;
+    color: white;
+}
+
+.closescoring:hover{
+    background-color: rgb(255, 140, 140);
+}

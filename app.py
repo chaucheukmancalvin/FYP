@@ -13,9 +13,10 @@ UPLOAD_FOLDER = os.getcwd() + '/static' + '/img'
 ALLOWED_EXTENSTIONS = set(['png', 'jpg', 'jpeg'])
 
 app = Flask(__name__)
-mail = Mail(app)
+
 app.config['SECRET_KEY'] = 'SecretKeyHERE!'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = '205project2019@gmail.com'
@@ -149,37 +150,38 @@ def history():
     today=datetime.today()
     return render_template('history.html', table=table, today=today)
 
-@app.route("/scoring")
-def scoring():
-    return render_template('scoring.html')
-
 @app.route("/scoring_mark", methods=['POST'])
 def scoring_mark():
-    staff_ID = session['staffs']
+    staff_name = request.form['staff']
+    service_name = request.form['service']
+    date = request.form['date']
     mark = request.form['score']
-    now=datetime.now()
-    sql="SELECT booking_time, service FROM timetable WHERE staff ='%s' and booking_time <= '%s' ORDER BY DESC"%(staff_ID, now)
-    cursor.execute()
-    service_time = cursor.fetchone()
-    servicetime = service_time[0]
-    service = service_time[1]
-    sql="UPDATE timetable SET score='%s' WHERE booking_time = '%s' and staff='%s'"%(mark, servicetime, staff_ID)
-    cursor.execute()
-    db.commit()
-    sql="SELECT score, service FROM timetable WHERE service='%s' and staff='%s'"%(service, staff_ID)
-    cursor.execute()
-    total_score=cursor.fetchall()
-    totalscore = 0
-    count = 0
-    for i in total_score:
-        if i[0] != None:
-            totalscore += i[0]
-            count+=1
-    adv_score=totalscore/count
-    sql="UPDATE score SET score='%s' WHERE service = '%s' and staff = '%s'"%(adv_score ,service, staff_ID)
-    cursor.execute()
-    db.commit()
-    return redirect(url_for('scoring'))
+    sql="SELECT a.booking_time, a.score, b.staff_ID, c.service_ID FROM timetable a, staff b, service c WHERE a.staff=b.staff_ID and a.service=c.service_ID and b.staff_name='%s' and c.service_name='%s' and a.booking_time='%s'"%(staff_name,service_name,date)
+    cursor.execute(sql)
+    service_appointment = cursor.fetchone()
+    if service_appointment != None:
+        sql="UPDATE timetable SET score='%s' WHERE booking_time = '%s' and staff='%s' and service='%s'"%(mark,date,service_appointment[2],service_appointment[3])
+        cursor.execute(sql)
+        db.commit()
+        sql="SELECT score, service FROM timetable WHERE service='%s' and staff='%s'"%(service_appointment[3],service_appointment[2])
+        cursor.execute(sql)
+        total_score=cursor.fetchall()
+        totalscore = 0
+        count = 0
+        if total_score != ():
+            print(123)
+            for i in total_score:
+                if i[0] != None:
+                    totalscore += i[0]
+                    count+=1
+        if count != 0:
+            adv_score=totalscore/count
+        else:
+            adv_score=0
+        sql="UPDATE score SET score='%s' WHERE service = '%s' and staff = '%s'"%(adv_score ,service_appointment[3], service_appointment[2])
+        cursor.execute(sql)
+        db.commit()
+    return redirect(url_for('history'))
 
 @app.route("/booking")
 def booking():
@@ -388,7 +390,7 @@ def forgetpassword():
         password=cursor.fetchone()
         if password != None:
             msg = Message('Forgetpassword from salon.',sender='205project2019@gmail.com',recipients=[str(email)])
-            msg.body = "Your password is" + " " + password[0]
+            msg.body = "Your password is" + " " + str(password[0])
             mail.send(msg)
             messages = {"main":"*email sended"}
             session['messages'] = messages
