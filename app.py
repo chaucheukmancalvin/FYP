@@ -4,6 +4,8 @@ import MySQLdb
 from datetime import datetime, timedelta
 import calendar
 from werkzeug import secure_filename
+from flask_mail import Mail, Message
+import re
 db=MySQLdb.connect(host="127.0.0.1",user="root", passwd="",db="fyp",charset="utf8")
 cursor=db.cursor()
 
@@ -11,8 +13,17 @@ UPLOAD_FOLDER = os.getcwd() + '/static' + '/img'
 ALLOWED_EXTENSTIONS = set(['png', 'jpg', 'jpeg'])
 
 app = Flask(__name__)
+mail = Mail(app)
 app.config['SECRET_KEY'] = 'SecretKeyHERE!'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = '205project2019@gmail.com'
+app.config['MAIL_PASSWORD'] = '205project'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail=Mail(app)
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -366,6 +377,31 @@ def loginFunction():
         session['member']= userid
         return redirect(url_for('index'))
 
+@app.route("/forgetpassword", methods=['POST'])
+def forgetpassword():
+    user_ID=request.form['userid']
+    username=request.form['username']
+    email=request.form['email']
+    if re.match("[^@]+@[^@]+\.[^@]+", email):
+        sql="SELECT password FROM member WHERE member_ID='%s' and member_name='%s'"%(user_ID,username)
+        cursor.execute(sql)
+        password=cursor.fetchone()
+        if password != None:
+            msg = Message('Forgetpassword from salon.',sender='205project2019@gmail.com',recipients=[str(email)])
+            msg.body = "Your password is" + " " + password[0]
+            mail.send(msg)
+            messages = {"main":"*email sended"}
+            session['messages'] = messages
+            return redirect(url_for('login', messages=messages))
+        else:
+            messages = {"main":"*user id or user name fail please try again"}
+            session['messages'] = messages
+            return redirect(url_for('login', messages=messages))
+    else:
+        messages = {"main":"*wrong email format please try again"}
+        session['messages'] = messages
+        return redirect(url_for('login', messages=messages))
+
 @app.route("/bookingservice_duration", methods=['POST'])
 def bookingservice_duration():
     service = request.form['service_duration']
@@ -564,10 +600,11 @@ def timetable():
             print(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'))
             while timedelta(hours=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%M'))) <= timedelta(hours=int(datetime.strftime(datetime.strptime(str(end_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(end_time), '%Y-%m-%d %H:%M:%S'), '%M'))):
                 staff_work = []
+                details=[]
                 print('2')
                 for i in staff:
                     next_curr_time=datetime.strptime(str(timedelta(hours=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%M'))) + timedelta(minutes=15)), '%H:%M:%S')
-                    sql="SELECT a.staff_name, b.booking_time, c.duration, c.service_name FROM staff a, timetable b, service c WHERE a.staff_ID=b.staff and c.service_ID=b.service and '%s'>b.booking_time and b.booking_time>='%s' and a.staff_name='%s'"%(datetime.strptime(str(year)+'-'+str(month)+'-'+str(day)+' '+str(datetime.strftime(datetime.strptime(str(next_curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S')), '%Y-%m-%d %H:%M:%S'),datetime.strptime(str(year)+'-'+str(month)+'-'+str(day)+' '+str(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S')), '%Y-%m-%d %H:%M:%S'), i[0])
+                    sql="SELECT a.staff_name, b.booking_time, c.duration, c.service_name, b.seat FROM staff a, timetable b, service c WHERE a.staff_ID=b.staff and c.service_ID=b.service and '%s'>b.booking_time and b.booking_time>='%s' and a.staff_name='%s'"%(datetime.strptime(str(year)+'-'+str(month)+'-'+str(day)+' '+str(datetime.strftime(datetime.strptime(str(next_curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S')), '%Y-%m-%d %H:%M:%S'),datetime.strptime(str(year)+'-'+str(month)+'-'+str(day)+' '+str(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S')), '%Y-%m-%d %H:%M:%S'), i[0])
                     cursor.execute(sql)
                     result=cursor.fetchone()
                     print('3')
@@ -580,9 +617,11 @@ def timetable():
                         for j in result1:
                             if timedelta(hours=int(datetime.strftime(datetime.strptime(str(next_curr_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(next_curr_time), '%Y-%m-%d %H:%M:%S'), '%M'))) > timedelta(hours=int(datetime.strftime(datetime.strptime(str(j[1]), '%Y-%m-%d %H:%M:%S'),'%H')), minutes=int(datetime.strftime(datetime.strptime(str(j[1]), '%Y-%m-%d %H:%M:%S'),'%M')))+timedelta(hours=int(datetime.strftime(datetime.strptime(str(j[2]), '%H:%M:%S'),'%H')), minutes=int(datetime.strftime(datetime.strptime(str(j[2]), '%H:%M:%S'),'%M'))) >= timedelta(hours=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%M'))):
                                 staff_work.append('__end_work__')
+                                details.append([])
                                 endappend = 'Y'
                         if endappend == 'N':
                             staff_work.append('')
+                            details.append([])
                     else:
                         sql1="SELECT a.staff_name, b.booking_time, c.duration, c.service_name FROM staff a, timetable b, service c WHERE a.staff_ID=b.staff and c.service_ID=b.service and b.booking_time LIKE '%s%%' and a.staff_name='%s'"%(str(datetime.strptime(str(year)+'-'+str(month)+'-'+str(day), '%Y-%m-%d').strftime('%Y-%m-%d')), i[0])
                         cursor.execute(sql1)
@@ -591,11 +630,13 @@ def timetable():
                         for j in result1:
                             if timedelta(hours=int(datetime.strftime(datetime.strptime(str(next_curr_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(next_curr_time), '%Y-%m-%d %H:%M:%S'), '%M'))) > timedelta(hours=int(datetime.strftime(datetime.strptime(str(j[1]), '%Y-%m-%d %H:%M:%S'),'%H')), minutes=int(datetime.strftime(datetime.strptime(str(j[1]), '%Y-%m-%d %H:%M:%S'),'%M')))+timedelta(hours=int(datetime.strftime(datetime.strptime(str(j[2]), '%H:%M:%S'),'%H')), minutes=int(datetime.strftime(datetime.strptime(str(j[2]), '%H:%M:%S'),'%M'))) >= timedelta(hours=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%M'))):
                                 staff_work.append('__end&start_'+str(result[3])+'__')
+                                details.append(result)
                                 endappend = 'Y'
                         if endappend == 'N':
                             staff_work.append('__start_'+str(result[3])+'__')
+                            details.append(result)
                 print(staff_work)
-                time.append((datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S'), staff_work))
+                time.append((datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S'), staff_work,details))
                 print('4')
                 curr_time=datetime.strptime(str(timedelta(hours=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%M'))) + timedelta(minutes=15)), '%H:%M:%S')
             print('5')

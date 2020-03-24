@@ -5,8 +5,8 @@ import os
 db=MySQLdb.connect(host="127.0.0.1",user="root", passwd="",db="fyp",charset="utf8")
 cursor=db.cursor()
 
-sql="ALTER TABLE seat CHANGE available seat_condition varchar(50)"
+sql="SELECT password FROM member WHERE member_ID='M0000001'"
 cursor.execute(sql)
-db.commit()
-print("DONE")
+password=cursor.fetchone()
+print(password)
 

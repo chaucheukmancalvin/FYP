@@ -20,6 +20,19 @@
         <br>
         <input type="submit" value="Login">
     </form>
+    <button onclick="showforget()" class="showforgetpassword">forgetpassword</button>
+</div>
+<div class="forgetpassword">
+    <h1>Forget Password</h1><br>
+    <form action="/forgetpassword" method="POST">
+        user id: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="userid">
+        <br>
+        user name:<input type="text" name="username">
+        <br>
+        email: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="email" name="email">
+        <br>
+        <input type="submit" value="Forget password">
+    </form>
 </div>
 {% if session['messages'] %}
 <p class="messages">{{ messages['main'] }}</p>
@@ -27,6 +40,7 @@
 <button onclick="showRegister()" class="register_button">register requirement</button>
 <script>
     var x = document.getElementsByClassName("register");
+    var y = document.getElementsByClassName("forgetpassword");
 	function showRegister() {
         console.log(x)
 		if (x[0].style.display != "block") {
@@ -36,6 +50,16 @@
         else if (x[0].style.display != "none") {
             console.log(x)
             x[0].style.display = "none"
+        }
+    }
+    function showforget(){
+        if (y[0].style.display != "block") {
+            console.log(y)
+            y[0].style.display = "block"
+        }
+        else if (y[0].style.display != "none") {
+            console.log(y)
+            y[0].style.display = "none"
         }
     }
 </script>

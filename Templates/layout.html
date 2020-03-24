@@ -10,7 +10,7 @@
 <body>
 <nav class="Nav">
 <div class="Navtop">
-    {% if not session['admin'] and not session['staff'] %}
+    {% if not session['admin'] and not session['staffs'] %}
     <a href="{{url_for('index')}}"><img src="{{url_for('static', filename='img/home.png')}}"></a>
     {% elif session['admin'] %}
     <a href="{{url_for('admin')}}"><img src="{{url_for('static', filename='img/home.png')}}"></a>

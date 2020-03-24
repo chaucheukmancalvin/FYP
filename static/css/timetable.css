@@ -102,6 +102,7 @@
 
   .close{
       border: solid;
+      border-color: #eee;
       background: red;
       color: white;
   }
@@ -146,6 +147,34 @@
     color: #777;
     overflow-x: auto;
   }
+  .schedule li button {
+    background-color: #eee;
+    border: none;
+  }
+
+  .schedule li button:hover {
+    background-color: white;
+  }
+  .details {
+    display: none;
+    position: fixed;
+    top: 30%;
+    left: 30%;
+    z-index: 2;
+    background-color: white;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  }
+
+  .details button {
+      border: solid;
+      border-color: #eee;
+      background: red;
+      color: white;
+  }
+
+  .details button:hover {
+    background: rgb(255, 140, 140);
+}
 
   @media screen and (max-width:720px) {
     .weekdays li, .days li {width: 13.1%;}
@@ -160,6 +189,10 @@
     }
     .weekdays li, .days li {width: 12.5%;}
   }
+
+  .schedule li{
+    font-size: 6px;
+  }
   
   @media screen and (max-width: 290px) {
     .calendar {
@@ -169,4 +202,7 @@
       z-index: 9;
     }
     .weekdays li, .days li {width: 12.2%;}
+  }
+  .schedule li{
+    font-size: 6px;
   }

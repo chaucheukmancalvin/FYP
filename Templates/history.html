@@ -24,9 +24,11 @@
         <td>{{ i[2] }}</td>
         <td>{{ i[3] }}</td>
         <td>{{ i[4] }}</td>
+        <td>
         {% if today < i[2] %}
-        <td><form action="/historycancel" method="POST"><button type="submit" value="{{(i[2],i[3])}}" name="cancel">cancel</button></form></td>
+        <form action="/historycancel" method="POST"><button type="submit" value="{{(i[2],i[3])}}" name="cancel">cancel</button></form>
         {% endif %}
+        </td>
     </tr>
     {% endfor %}
     </tbody>

@@ -48,14 +48,27 @@
             {% endfor %}
         </ul>
         {% for i in time %}
+        {% set outer_loop = loop %}
         <ul class="schedule">
             <li>
                 {{i[0]}}
             </li>
             {% for j in i[1] %}
             <li>
-                {{j}}
+                <button onclick="showdetails({{ outer_loop.index -1}}, {{loop.index-1 }})">{{j}}</button>
             </li>
+            {% endfor %}
+            {% for k in i[2] %}
+            <div class="details">
+                <button onclick="closedetails({{ outer_loop.index -1 }}, {{loop.index-1 }})">X</button>
+            {% if k != [] %}
+               <p>staff: {{k[0]}}</p><br>
+               <p>time: {{k[1]}}</p><br>
+               <p>duration: {{k[2]}}</p><br>
+               <p>service: {{k[3]}}</p><br>
+               <p>seat: {{k[4]}}</p><br>
+            {% endif %}
+            </div>
             {% endfor %}
         </ul>
         {% endfor %}
@@ -66,6 +79,12 @@ function showcal() {
 }
 function closecal() {
   document.getElementsByClassName("calendar")[0].style.display = "none";
+}
+function showdetails(n,m) {
+  document.getElementsByClassName("details")[n*7+m].style.display = "block";
+}
+function closedetails(n,m) {
+  document.getElementsByClassName("details")[n*7+m].style.display = "none";
 }
 </script>
 {% endblock %}
