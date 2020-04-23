@@ -210,6 +210,11 @@ def booking():
                 price = (service_price[0] + staff_price[0]) * discount[0]
             else:
                 price = service_price[0] + staff_price[0]
+            if session.get('message'):
+                message = request.args['message']
+                message=session['message']
+                session.pop('message',None)
+                return render_template('booking.html',service=service, staff=staff, date=date, time=time, seat=seat, price=price, message=message)
             return render_template('booking.html',service=service, staff=staff, date=date, time=time, seat=seat, price=price)
         except:
             try:
@@ -544,25 +549,34 @@ def bookingFunction():
     time = session['time']
     seat = session['seat']
     booking_time = str(date)+' '+str(time)
-    sql="SELECT service_ID FROM service WHERE service_name='%s'"%service_name
-    cursor.execute(sql)
-    service=cursor.fetchone()
-    sql1="SELECT staff_ID FROM staff WHERE staff_name='%s'"%staff_name
-    cursor.execute(sql1)
-    staff=cursor.fetchone()
-    if session.get('member'):
-        sql2="INSERT INTO timetable (service,staff,booking_time,seat,member) VALUES (%s,%s,%s,%s,%s)"
-        val=(service[0],staff[0],booking_time,seat,session['member'])
-        cursor.execute(sql2,val)
-        db.commit()
+    email=request.form['email']
+    if re.match("[^@]+@[^@]+\.[^@]+", email):
+        sql="SELECT service_ID FROM service WHERE service_name='%s'"%service_name
+        cursor.execute(sql)
+        service=cursor.fetchone()
+        sql1="SELECT staff_ID FROM staff WHERE staff_name='%s'"%staff_name
+        cursor.execute(sql1)
+        staff=cursor.fetchone()
+        if session.get('member'):
+            sql2="INSERT INTO timetable (service,staff,booking_time,seat,member) VALUES (%s,%s,%s,%s,%s)"
+            val=(service[0],staff[0],booking_time,seat,session['member'])
+            cursor.execute(sql2,val)
+            db.commit()
+        else:
+            sql2="INSERT INTO timetable (service,staff,booking_time,seat) VALUES (%s,%s,%s,%s)"
+            val=(service[0],staff[0],booking_time,seat)
+            cursor.execute(sql2,val)
+            db.commit()
+        msg = Message('Salon booking.',sender='205project2019@gmail.com',recipients=[str(email)])
+        msg.body = "You have successfully booked " + " " + str(service_name) + " " + "for" + " " + str(booking_time)
+        mail.send(msg)
+        success = "booking success"
+        session['success'] = success
+        return redirect(url_for('booking', success=success))
     else:
-        sql2="INSERT INTO timetable (service,staff,booking_time,seat) VALUES (%s,%s,%s,%s)"
-        val=(service[0],staff[0],booking_time,seat)
-        cursor.execute(sql2,val)
-        db.commit()
-    success = "booking success"
-    session['success'] = success
-    return redirect(url_for('booking', success=success))
+        message = "*email not filled or wrong email format"
+        session['message'] = message
+        return redirect(url_for('booking', seat=seat, message=message))
 
 @app.route("/admin")
 def admin():

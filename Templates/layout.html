@@ -3,6 +3,8 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Salon advisor</title>
+<link rel="icon" href="{{url_for('static', filename='img/favicon.ico')}}" type="image/x-icon"/>
+
 <link rel="stylesheet" href="{{
     url_for('static', filename='css/layout.css')}}">
 {% block head %}{% endblock %}
@@ -32,24 +34,24 @@
     <div>
         <a href="{{url_for('contactus')}}">Contact us</a>
     </div>
-    {% if session['member'] %}
-    <div>
-        <a href="{{url_for('history')}}">History</a>
-    </div>
-    <div>
-        <a href="{{url_for('Profile')}}">Profile</a>
-    </div>
-    <div class="logout">
-        <form action="/logout" method="POST">
-            <input type="submit" value="logout">
-        </form>
-    </div>
-    {% endif %}
-    {% if not session['member'] %}
-    <div>
-        <a href="{{url_for('login')}}">Login</a>       
-    </div>
-    {% endif %}
+        {% if session['member'] %}
+        <div>
+            <a href="{{url_for('history')}}">History</a>
+        </div>
+        <div>
+            <a href="{{url_for('Profile')}}">Profile</a>
+        </div>
+        <div class="logout">
+            <form action="/logout" method="POST">
+                <input type="submit" value="logout">
+            </form>
+        </div>
+        {% endif %}
+        {% if not session['member'] %}
+        <div>
+            <a href="{{url_for('login')}}">Login</a>       
+        </div>
+        {% endif %}
     {% elif session['admin'] %}
     <div>
         <a href="{{url_for('timetable')}}">timetable</a>

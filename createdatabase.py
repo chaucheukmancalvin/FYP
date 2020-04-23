@@ -31,7 +31,27 @@ cursor.execute(sql44)
 
 sql49="ALTER TABLE working_week DROP FOREIGN KEY FK_working_week_staff"
 cursor.execute(sql49)
+
+sql58="ALTER TABLE product_usage DROP FOREIGN KEY FK_product_usage"
+cursor.execute(sql58)
+
+sql59="ALTER TABLE product_usage DROP FOREIGN KEY FK_service_usage"
+cursor.execute(sql59)
+
+sql60="ALTER TABLE stock DROP FOREIGN KEY FK_stock"
+cursor.execute(sql60)
+
+sql66="ALTER TABLE remark DROP FOREIGN KEY FK_remark"
+cursor.execute(sql66)
+
 #----------
+
+sql67="DROP TABLE remark"
+cursor.execute(sql67)
+
+sql61="DROP TABLE product_usage"
+cursor.execute(sql61)
+
 sql28="DROP TABLE staff"
 cursor.execute(sql28)
 
@@ -61,6 +81,13 @@ cursor.execute(sql36)
 
 sql50="DROP TABLE working_week"
 cursor.execute(sql50)
+
+sql62="DROP TABLE stock"
+cursor.execute(sql62)
+
+sql63="DROP TABLE product"
+cursor.execute(sql63)
+
 #--------------------------------------------------
 sql="CREATE TABLE staff (staff_ID CHAR(8) PRIMARY KEY NOT NULL, staff_name VARCHAR(50) NOT NULL, gender CHAR(1) NOT NULL, position VARCHAR(20) NOT NULL, salary FLOAT(1) NOT NULL, price FLOAT(1) NOT NULL, working_hour TIME(0) NOT NULL)"
 cursor.execute(sql)
@@ -91,6 +118,19 @@ cursor.execute(sql7)
 
 sql45="CREATE TABLE working_week (week CHAR(3) NOT NULL, staff CHAR(8) NOT NULL)"
 cursor.execute(sql45)
+
+sql51="CREATE TABLE product(product_ID CHAR(2) PRIMARY KEY NOT NULL, product_name VARCHAR(50) NOT NULL, price FLOAT(1) NOT NULL, capacity_ml INT(5) NOT NULL)"
+cursor.execute(sql51)
+
+sql52="CREATE TABLE stock(product CHAR(2) PRIMARY KEY NOT NULL, product_number INT(5) NOT NULL)"
+cursor.execute(sql52)
+
+sql53="CREATE TABLE product_usage(product CHAR(2) NOT NULL, service CHAR(3) NOT NULL, estimate_usage FLOAT(2) NOT NULL)"
+cursor.execute(sql53)
+
+sql64="CREATE TABLE remark (reamrk_ID CHAR(3) PRIMARY KEY NOT NULL, service CHAR(3) NOT NULL, remark_name VARCHAR(50) NOT NULL, price FLOAT(1) NOT NULL)"
+cursor.execute(sql64)
+
 #------------------------------------------------
 sql8="ALTER TABLE staff_holiday ADD PRIMARY KEY (staff,holiday)"
 cursor.execute(sql8)
@@ -133,6 +173,21 @@ cursor.execute(sql46)
 
 sql47="ALTER TABLE working_week ADD CONSTRAINT FK_working_week_staff FOREIGN KEY (staff) REFERENCES staff(staff_ID)"
 cursor.execute(sql47)
+
+sql54="ALTER TABLE stock ADD CONSTRAINT FK_stock FOREIGN KEY (product) REFERENCES product(product_ID)"
+cursor.execute(sql54)
+
+sql55="ALTER TABLE product_usage ADD PRIMARY KEY (product,service)"
+cursor.execute(sql55)
+
+sql56="ALTER TABLE product_usage ADD CONSTRAINT FK_product_usage FOREIGN KEY (product) REFERENCES product(product_ID)"
+cursor.execute(sql56)
+
+sql57="ALTER TABLE product_usage ADD CONSTRAINT FK_service_usage FOREIGN KEY (service) REFERENCES service(service_ID)"
+cursor.execute(sql57)
+
+sql65="ALTER TABLE remark ADD CONSTRAINT FK_remark FOREIGN KEY (service) REFERENCES service(service_ID)"
+cursor.execute(sql65)
 
 #--------------------------------------------
 sql20="INSERT INTO staff (staff_ID, staff_name, gender, position, salary, price, working_hour) VALUES (%s , %s, %s, %s, %s, %s, %s)"
