@@ -79,8 +79,24 @@
                 }
              }
         </script>
+        {% elif not session['remark'] %}
+        <p>service:{{service}}</p>
+        <p>Choose a remark</p>
+        <form action="/booking_remark" method="POST" class="remark">
+            <select name="remark" >
+                <option value="none">None</option>
+                {% for i in remark %}
+                <option value={{i[0]}}>{{i[0]}} extra:${{i[2]}}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Next" class="Next">
+        </form>
+        <form action="/bookingcancel" method="POST">
+            <input type="submit" value="cancel" class="cancel">
+        </form>
         {% elif not session['staff'] %}
-        <p>service:{{service}}</p><br>
+        <p>service:{{service}}</p>
+        <p>remark:{{remark}}</p>
         <p>Choose a staff</p>
         <button onclick="showScore()">sort by score</button>
         <button onclick="showPrice()">sort by price</button>
@@ -194,6 +210,7 @@
         </script>
         {% elif not session['date'] %}          
         <p>service:{{service}}</p>
+        <p>remark:{{remark}}</p>
         <p>staff:{{staff}}</p>
         <p>Choose a date</p>
         <form action="/bookingdate" method="POST">
@@ -273,6 +290,7 @@
         </script>
         {% elif not session['time'] %}
         <p>service:{{service}}</p>
+        <p>remark:{{remark}}</p>
         <p>staff:{{staff}}</p>
         <p>date:{{date}}</p>
         <p>Choose a time</p>
@@ -298,6 +316,7 @@
         </form>
         {% elif not session['seat'] %}
         <p>service:{{service}}</p>
+        <p>remark:{{remark}}</p>
         <p>staff:{{staff}}</p>
         <p>date:{{date}}</p>
         <p>time:{{time}}</p>
@@ -317,6 +336,7 @@
         {% elif not session['success'] %}
         <form action="/bookingFunction" method="POST">
             <h1>service:{{ service }}</h1>
+            <h1>remark:{{remark}}</h1>
             <h1>staff:{{ staff }}</h1>
             <h1>date:{{ date }}</h1>
             <h1>time:{{ time }}</h1>

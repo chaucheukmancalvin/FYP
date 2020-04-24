@@ -144,11 +144,18 @@ def contactus():
 @app.route("/history")
 def history():
     member=session['member']
-    sql="SELECT a.service_name, b.staff_name, c.booking_time, c.seat, c.score FROM service a, staff b, timetable c WHERE a.service_ID=c.service and b.staff_ID=c.staff and c.member='%s'"%member
+    sql="SELECT a.service_name, b.staff_name, c.booking_time, c.seat, c.score, c.remark FROM service a, staff b, timetable c WHERE a.service_ID=c.service and b.staff_ID=c.staff and c.member='%s' "%member
     cursor.execute(sql)
     table=cursor.fetchall()
+    Table=list(table)
+    for n,i in enumerate(Table):
+        if i[5]!=None:
+            sql="SELECT a.service_name, b.staff_name, c.booking_time, c.seat, c.score, d.remark_name FROM service a, staff b, timetable c, remark d WHERE a.service_ID=c.service and b.staff_ID=c.staff and c.member='M0000001' and d.remark_ID=c.remark and c.booking_time='%s'"%i[2]
+            cursor.execute(sql)
+            new=cursor.fetchone()
+            Table[n]=new
     today=datetime.today()
-    return render_template('history.html', table=table, today=today)
+    return render_template('history.html', table=Table, today=today)
 
 @app.route("/scoring_mark", methods=['POST'])
 def scoring_mark():
@@ -197,25 +204,31 @@ def booking():
             date = session['date']
             staff = session['staff']
             service = session['service']
+            remark=session['remark']
             sql="SELECT price FROM service WHERE service_name='%s'"%service
             cursor.execute(sql)
             service_price=cursor.fetchone()
             sql1="SELECT price FROM staff WHERE staff_name='%s'"%staff
             cursor.execute(sql1)
             staff_price=cursor.fetchone()
+            remark_price=[0,0]
+            if remark != "none":
+                sql3="SELECT a.price, b.service_name FROM remark a, service b WHERE a.remark_name='%s' and a.service=b.service_ID and b.service_name='%s'"%(remark,service)
+                cursor.execute(sql3)
+                remark_price=cursor.fetchone()
             if session.get('member'):
                 sql2 = "SELECT a.discount, b.member_ID FROM membership a, member b WHERE b.member_ID='%s' and b.membership=a.membership_ID"%session['member']
                 cursor.execute(sql2)
                 discount = cursor.fetchone()
-                price = (service_price[0] + staff_price[0]) * discount[0]
+                price = (service_price[0] + staff_price[0] + remark_price[0]) * discount[0]
             else:
-                price = service_price[0] + staff_price[0]
+                price = service_price[0] + staff_price[0] + remark_price[0]
             if session.get('message'):
                 message = request.args['message']
                 message=session['message']
                 session.pop('message',None)
-                return render_template('booking.html',service=service, staff=staff, date=date, time=time, seat=seat, price=price, message=message)
-            return render_template('booking.html',service=service, staff=staff, date=date, time=time, seat=seat, price=price)
+                return render_template('booking.html',service=service, remark=remark, staff=staff, date=date, time=time, seat=seat, price=price, message=message)
+            return render_template('booking.html',service=service, remark=remark, staff=staff, date=date, time=time, seat=seat, price=price)
         except:
             try:
                 time = request.args['time']
@@ -223,6 +236,7 @@ def booking():
                 date = session['date']
                 staff = session['staff']
                 service = session['service']
+                remark = session['remark']
                 dates = datetime.strptime(date+' '+time ,"%Y-%m-%d %H:%M:%S")
                 sql="SELECT duration FROM service WHERE service_name = '%s'"%service
                 cursor.execute(sql)
@@ -255,14 +269,15 @@ def booking():
                     message = request.args['message']
                     message=session['message']
                     session.pop('message',None)
-                    return render_template('booking.html',service=service, staff=staff, date=date, time=time, seat=seat, message=message)
-                return render_template('booking.html',service=service, staff=staff, date=date, time=time, seat=seat)
+                    return render_template('booking.html',service=service ,remark=remark ,staff=staff, date=date, time=time, seat=seat, message=message)
+                return render_template('booking.html',service=service ,remark=remark , staff=staff, date=date, time=time, seat=seat)
             except:
                 try:
                     date = request.args['date']
                     date = session['date']
                     staff = session['staff']
                     service = session['service']
+                    remark = session['remark']
                     hour=[]
                     minute=[0,15,30,45]
                     week= int(datetime.strptime(date,'%Y-%m-%d').weekday())
@@ -276,13 +291,14 @@ def booking():
                         message = request.args['message']
                         message=session['message']
                         session.pop('message',None)
-                        return render_template('booking.html',service=service, staff=staff, date=date, hour=hour, minute=minute,message=message)
-                    return render_template('booking.html',service=service, staff=staff, date=date, hour=hour, minute=minute)
+                        return render_template('booking.html',service=service, remark=remark, staff=staff, date=date, hour=hour, minute=minute,message=message)
+                    return render_template('booking.html',service=service ,remark=remark , staff=staff, date=date, hour=hour, minute=minute)
                 except:
                     try:
                         staff = request.args['staff']
                         staff = session['staff']
                         service = session['service']
+                        remark = session['remark']
                         years=int(datetime.today().strftime('%Y'))
                         year=[]
                         month=[]
@@ -297,11 +313,12 @@ def booking():
                             message = request.args['message']
                             message=session['message']
                             session.pop('message',None)
-                            return render_template('booking.html',service=service, staff=staff, year=year, month=month, day=day, message=message)
-                        return render_template('booking.html',service=service, staff=staff, year=year, month=month, day=day)
+                            return render_template('booking.html',service=service ,remark=remark ,staff=staff, year=year, month=month, day=day, message=message)
+                        return render_template('booking.html',service=service ,remark=remark , staff=staff, year=year, month=month, day=day)
                     except:
                         try:
-                            service = request.args['service']
+                            remark = request.args['remark']
+                            remark = session['remark']
                             service = session['service']
                             sql="SELECT a.staff_name, c.service_name, b.score FROM staff a, score b, service c WHERE a.staff_ID = b.staff and c.service_ID = b.service and c.service_name='%s' ORDER BY b.score DESC"%service
                             cursor.execute(sql)
@@ -317,33 +334,47 @@ def booking():
                                 message = request.args['message']
                                 message=session['message']
                                 session.pop('message',None)
-                                return render_template('booking.html',service=service, staff_score=staff_score, staff_price=staff_price, staff_exp=staff_exp, message=message)
-                            return render_template('booking.html',service=service, staff_score=staff_score, staff_price=staff_price, staff_exp=staff_exp)
+                                return render_template('booking.html',service=service ,remark=remark ,staff_score=staff_score, staff_price=staff_price, staff_exp=staff_exp, message=message)
+                            return render_template('booking.html',service=service ,remark=remark ,staff_score=staff_score, staff_price=staff_price, staff_exp=staff_exp)
                         except:
-                            if session.get('success'):
-                                session.pop('success',None)
-                            if session.get('service'):
-                                session.pop('service',None)
-                            if session.get('staff'):
-                                session.pop('staff',None)
-                            if session.get('date'):
-                                session.pop('date',None)
-                            if session.get('time'):
-                                session.pop('time',None)
-                            if session.get('seat'):
-                                session.pop('seat',None)
-                            service_sql="SELECT service_name ,duration FROM service ORDER BY duration ASC"
-                            cursor.execute(service_sql)
-                            service_duration=cursor.fetchall()
-                            service_sql1="SELECT service_name ,price FROM service ORDER BY price ASC"
-                            cursor.execute(service_sql1)
-                            service_price=cursor.fetchall()
-                            if session.get('message'):
-                                message = request.args['message']
-                                message=session['message']
-                                session.pop('message',None)
-                                return render_template('booking.html',service_duration=service_duration, service_price=service_price, message=message)
-                            return render_template('booking.html',service_duration=service_duration, service_price=service_price)
+                            try:
+                                service = request.args['service']
+                                service = session['service']
+                                sql="SELECT a.remark_name, b.service_name, a.price FROM remark a, service b WHERE a.service = b.service_ID and b.service_name = '%s'"%service
+                                cursor.execute(sql)
+                                remark=cursor.fetchall()
+                                if remark==():
+                                    remark="none"
+                                    session['remark']=remark
+                                    return redirect(url_for('booking', remark=remark))
+                                return render_template('booking.html',service=service,remark=remark)
+                            except:
+                                if session.get('success'):
+                                    session.pop('success',None)
+                                if session.get('service'):
+                                    session.pop('service',None)
+                                if session.get('remark'):
+                                    session.pop('remark',None)
+                                if session.get('staff'):
+                                    session.pop('staff',None)
+                                if session.get('date'):
+                                    session.pop('date',None)
+                                if session.get('time'):
+                                    session.pop('time',None)
+                                if session.get('seat'):
+                                    session.pop('seat',None)
+                                service_sql="SELECT service_name ,duration FROM service ORDER BY duration ASC"
+                                cursor.execute(service_sql)
+                                service_duration=cursor.fetchall()
+                                service_sql1="SELECT service_name ,price FROM service ORDER BY price ASC"
+                                cursor.execute(service_sql1)
+                                service_price=cursor.fetchall()
+                                if session.get('message'):
+                                    message = request.args['message']
+                                    message=session['message']
+                                    session.pop('message',None)
+                                    return render_template('booking.html',service_duration=service_duration, service_price=service_price, message=message)
+                                return render_template('booking.html',service_duration=service_duration, service_price=service_price)
 
 @app.route("/login")
 def login():
@@ -420,6 +451,12 @@ def bookingservice_price():
     service = request.form['service_price']
     session['service'] = service
     return redirect(url_for('booking',service=service))
+
+@app.route("/booking_remark", methods=['POST'])
+def bookingremark():
+    remark = request.form['remark']
+    session['remark'] = remark
+    return redirect(url_for('booking',remark=remark))
 
 @app.route("/bookingstaff_score", methods=['POST'])
 def bookingstaff_score():
@@ -548,6 +585,7 @@ def bookingFunction():
     date = session['date']
     time = session['time']
     seat = session['seat']
+    remark_name=session['remark']
     booking_time = str(date)+' '+str(time)
     email=request.form['email']
     if re.match("[^@]+@[^@]+\.[^@]+", email):
@@ -557,16 +595,31 @@ def bookingFunction():
         sql1="SELECT staff_ID FROM staff WHERE staff_name='%s'"%staff_name
         cursor.execute(sql1)
         staff=cursor.fetchone()
-        if session.get('member'):
-            sql2="INSERT INTO timetable (service,staff,booking_time,seat,member) VALUES (%s,%s,%s,%s,%s)"
-            val=(service[0],staff[0],booking_time,seat,session['member'])
-            cursor.execute(sql2,val)
-            db.commit()
+        if remark_name=="none":
+            if session.get('member'):
+                sql2="INSERT INTO timetable (service,staff,booking_time,seat,member) VALUES (%s,%s,%s,%s,%s)"
+                val=(service[0],staff[0],booking_time,seat,session['member'])
+                cursor.execute(sql2,val)
+                db.commit()
+            else:
+                sql2="INSERT INTO timetable (service,staff,booking_time,seat) VALUES (%s,%s,%s,%s)"
+                val=(service[0],staff[0],booking_time,seat)
+                cursor.execute(sql2,val)
+                db.commit()
         else:
-            sql2="INSERT INTO timetable (service,staff,booking_time,seat) VALUES (%s,%s,%s,%s)"
-            val=(service[0],staff[0],booking_time,seat)
-            cursor.execute(sql2,val)
-            db.commit()
+            sql3="SELECT a.remark_ID, b.service_name FROM remark a, service b WHERE a.remark_name='%s' and a.service=b.service_ID and b.service_name='%s'"%(remark_name,service_name)
+            cursor.execute(sql3)
+            remark=cursor.fetchone()
+            if session.get('member'):
+                sql2="INSERT INTO timetable (service,staff,booking_time,seat,member,remark) VALUES (%s,%s,%s,%s,%s,%s)"
+                val=(service[0],staff[0],booking_time,seat,session['member'],remark[0])
+                cursor.execute(sql2,val)
+                db.commit()
+            else:
+                sql2="INSERT INTO timetable (service,staff,booking_time,seat,remark) VALUES (%s,%s,%s,%s,%s)"
+                val=(service[0],staff[0],booking_time,seat,remark[0])
+                cursor.execute(sql2,val)
+                db.commit()
         msg = Message('Salon booking.',sender='205project2019@gmail.com',recipients=[str(email)])
         msg.body = "You have successfully booked " + " " + str(service_name) + " " + "for" + " " + str(booking_time)
         mail.send(msg)
@@ -620,7 +673,7 @@ def timetable():
                 print('2')
                 for i in staff:
                     next_curr_time=datetime.strptime(str(timedelta(hours=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%M'))) + timedelta(minutes=15)), '%H:%M:%S')
-                    sql="SELECT a.staff_name, b.booking_time, c.duration, c.service_name, b.seat FROM staff a, timetable b, service c WHERE a.staff_ID=b.staff and c.service_ID=b.service and '%s'>b.booking_time and b.booking_time>='%s' and a.staff_name='%s'"%(datetime.strptime(str(year)+'-'+str(month)+'-'+str(day)+' '+str(datetime.strftime(datetime.strptime(str(next_curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S')), '%Y-%m-%d %H:%M:%S'),datetime.strptime(str(year)+'-'+str(month)+'-'+str(day)+' '+str(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S')), '%Y-%m-%d %H:%M:%S'), i[0])
+                    sql="SELECT a.staff_name, b.booking_time, c.duration, c.service_name, b.seat, b.remark FROM staff a, timetable b, service c WHERE a.staff_ID=b.staff and c.service_ID=b.service and '%s'>b.booking_time and b.booking_time>='%s' and a.staff_name='%s'"%(datetime.strptime(str(year)+'-'+str(month)+'-'+str(day)+' '+str(datetime.strftime(datetime.strptime(str(next_curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S')), '%Y-%m-%d %H:%M:%S'),datetime.strptime(str(year)+'-'+str(month)+'-'+str(day)+' '+str(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S')), '%Y-%m-%d %H:%M:%S'), i[0])
                     cursor.execute(sql)
                     result=cursor.fetchone()
                     print('3')
@@ -639,6 +692,10 @@ def timetable():
                             staff_work.append('')
                             details.append([])
                     else:
+                        if result[5]!=None:
+                            sql="SELECT a.staff_name, b.booking_time, c.duration, c.service_name, b.seat, d.remark_name FROM staff a, timetable b, service c, remark d WHERE a.staff_ID=b.staff and c.service_ID=b.service and '%s'>b.booking_time and b.booking_time>='%s' and a.staff_name='%s' and b.remark=d.remark_ID"%(datetime.strptime(str(year)+'-'+str(month)+'-'+str(day)+' '+str(datetime.strftime(datetime.strptime(str(next_curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S')), '%Y-%m-%d %H:%M:%S'),datetime.strptime(str(year)+'-'+str(month)+'-'+str(day)+' '+str(datetime.strftime(datetime.strptime(str(curr_time), '%Y-%m-%d %H:%M:%S'), '%H:%M:%S')), '%Y-%m-%d %H:%M:%S'), i[0])
+                            cursor.execute(sql)
+                            result=cursor.fetchone()
                         sql1="SELECT a.staff_name, b.booking_time, c.duration, c.service_name FROM staff a, timetable b, service c WHERE a.staff_ID=b.staff and c.service_ID=b.service and b.booking_time LIKE '%s%%' and a.staff_name='%s'"%(str(datetime.strptime(str(year)+'-'+str(month)+'-'+str(day), '%Y-%m-%d').strftime('%Y-%m-%d')), i[0])
                         cursor.execute(sql1)
                         result1=cursor.fetchall()
@@ -871,12 +928,13 @@ def POS():
             seat = session['POS_seat']
             staff = session['POS_staff']
             service = session['POS_service']
+            remark=session['POS_remark']
             try:
                 mes=request.args['mes']
                 mes="wrong ID or password"
-                return render_template('POS.html', service=service, staff=staff, seat=seat, price=price, mes=mes)
+                return render_template('POS.html', service=service, remark=remark, staff=staff, seat=seat, price=price, mes=mes)
             except:
-                return render_template('POS.html', service=service, staff=staff, seat=seat, price=price)
+                return render_template('POS.html', service=service, remark=remark, staff=staff, seat=seat, price=price)
         except:
             try:
                 seat = request.args['seat']
@@ -884,77 +942,102 @@ def POS():
                 seat = session['POS_seat']
                 staff = session['POS_staff']
                 service = session['POS_service']
+                remark=session['POS_remark']
                 try:
                     mes=request.args['mes']
                     mes="wrong ID or password"
-                    return render_template('POS.html', service=service, staff=staff, seat=seat, mes=mes)
+                    return render_template('POS.html', service=service,remark=remark, staff=staff, seat=seat, mes=mes)
                 except:
-                    return render_template('POS.html', service=service, staff=staff, seat=seat)
+                    return render_template('POS.html', service=service, remark=remark, staff=staff, seat=seat)
             except:
                 try:
                     staff = request.args['staff']
                     seat = session['POS_seat']
                     staff = session['POS_staff']
                     service = session['POS_service']
-                    return render_template('POS.html', service=service, staff=staff, seat=seat)
+                    remark = session['POS_remark']
+                    return render_template('POS.html', service=service, remark=remark, staff=staff, seat=seat)
                 except:
                     try:
-                        service = request.args['service']
+                        remark = request.args['remark']
+                        print('1')
                         staff = session['POS_staff']
                         service = session['POS_service']
-                        return render_template('POS.html', service=service, staff=staff)
+                        remark = session['POS_remark']
+                        return render_template('POS.html', service=service, remark=remark, staff=staff)
                     except:
-                        if session.get('POS_staff'):
-                            session.pop('POS_staff', None)
-                        if session.get('POS_service'):
-                            session.pop('POS_service', None)
-                        if session.get('POS_seat'):
-                            session.pop('POS_seat', None)
-                        if session.get('POS_member'):
-                            session.pop('POS_member', None)
-                        if session.get('POS_price'):
-                            session.pop('POS_price', None)
-                        if session.get('POS_done'):
-                            session.pop('POS_done', None)
-                        sql="SELECT service_name, price, duration FROM service"
-                        cursor.execute(sql)
-                        result=cursor.fetchall()
-                        now=datetime.now()
-                        weekday = int(now.weekday())
-                        print(timedelta(hours=int(datetime.strftime(now,'%H')), minutes=int(datetime.strftime(now,'%M'))))
-                        service=[]
-                        imgs=[]
-                        service_img=[]
-                        if weekday == 5 or weekday == 6:  
-                            end_time = datetime.strptime('19:00:00', '%H:%M:%S')
-                        if weekday == 0 or weekday ==1 or weekday ==2 or weekday == 3 or weekday == 4:
-                            end_time = datetime.strptime('17:00:00', '%H:%M:%S')
-                        for i in result:
-                            if timedelta(hours=int(datetime.strftime(now,'%H')), minutes=int(datetime.strftime(now,'%M')))+timedelta(hours=int(datetime.strftime(datetime.strptime(str(i[2]), '%H:%M:%S'),'%H')), minutes=int(datetime.strftime(datetime.strptime(str(i[2]), '%H:%M:%S'),'%M'))) <= timedelta(hours=int(datetime.strftime(datetime.strptime(str(end_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(end_time), '%Y-%m-%d %H:%M:%S'), '%M'))):
-                                service.append(i[0])
-                                try:
-                                    img = open('static/img/' + 'POS' + i[0]  + '.' + 'png')
-                                    img.close()
-                                    imgs.append('png')
-                                except:
+                        try:
+                            service = request.args['service']
+                            service = session['POS_service']
+                            remark = session['POS_remark']
+                            return render_template('POS.html', service=service, remark=remark)
+                        except:
+                            if session.get('POS_staff'):
+                                session.pop('POS_staff', None)
+                            if session.get('POS_service'):
+                                session.pop('POS_service', None)
+                            if session.get('POS_remark'):
+                                session.pop('POS_remark', None)
+                            if session.get('POS_seat'):
+                                session.pop('POS_seat', None)
+                            if session.get('POS_member'):
+                                session.pop('POS_member', None)
+                            if session.get('POS_price'):
+                                session.pop('POS_price', None)
+                            if session.get('POS_done'):
+                                session.pop('POS_done', None)
+                            sql="SELECT service_name, price, duration FROM service"
+                            cursor.execute(sql)
+                            result=cursor.fetchall()
+                            now=datetime.now()
+                            weekday = int(now.weekday())
+                            print(timedelta(hours=int(datetime.strftime(now,'%H')), minutes=int(datetime.strftime(now,'%M'))))
+                            service=[]
+                            imgs=[]
+                            service_img=[]
+                            if weekday == 5 or weekday == 6:  
+                                end_time = datetime.strptime('19:00:00', '%H:%M:%S')
+                            if weekday == 0 or weekday ==1 or weekday ==2 or weekday == 3 or weekday == 4:
+                                end_time = datetime.strptime('17:00:00', '%H:%M:%S')
+                            for i in result:
+                                if timedelta(hours=int(datetime.strftime(now,'%H')), minutes=int(datetime.strftime(now,'%M')))+timedelta(hours=int(datetime.strftime(datetime.strptime(str(i[2]), '%H:%M:%S'),'%H')), minutes=int(datetime.strftime(datetime.strptime(str(i[2]), '%H:%M:%S'),'%M'))) <= timedelta(hours=int(datetime.strftime(datetime.strptime(str(end_time), '%Y-%m-%d %H:%M:%S'), '%H')), minutes=int(datetime.strftime(datetime.strptime(str(end_time), '%Y-%m-%d %H:%M:%S'), '%M'))):
+                                    service.append(i[0])
                                     try:
-                                        img = open('static/img/' + 'POS' + i[0] + '.' + 'jpg')
-                                        img.colse()
-                                        imgs.append('jpg')
+                                        img = open('static/img/' + 'POS' + i[0]  + '.' + 'png')
+                                        img.close()
+                                        imgs.append('png')
                                     except:
                                         try:
-                                            img = open('static/img/' + 'POS' + i[0] + '.' + 'jpeg')
-                                            img.colse()
-                                            imgs.append('jpeg')
+                                            img = open('static/img/' + 'POS' + i[0] + '.' + 'jpg')
+                                            img.close()
+                                            imgs.append('jpg')
                                         except:
-                                            imgs.append('png')
-                        service_img.append(service)
-                        service_img.append(imgs)
-                        return render_template('POS.html', service_img=service_img)
+                                            try:
+                                                img = open('static/img/' + 'POS' + i[0] + '.' + 'jpeg')
+                                                img.close()
+                                                imgs.append('jpeg')
+                                            except:
+                                                imgs.append('png')
+                            service_img.append(service)
+                            service_img.append(imgs)
+                            return render_template('POS.html', service_img=service_img)
 
 @app.route("/POS_service", methods=['POST'])
 def POS_service():
     service=request.form['service']
+    sql="SELECT a.remark_name, b.service_name, a.price FROM remark a, service b WHERE a.service=b.service_ID and b.service_name='%s'"%service
+    cursor.execute(sql)
+    remark=cursor.fetchall()
+    session['POS_service']=service
+    session['POS_remark']=remark
+    return redirect(url_for('POS', service=service))
+
+@app.route("/POS_remark", methods=['POST'])
+def POS_remark():
+    remark=request.form['remark']
+    if remark=="None":
+        remark="None"
+    service=session['POS_service']
     now=datetime.now()
     today=datetime.today()
     sql="SELECT a.staff_name, c.booking_time, b.duration FROM staff a, service b, timetable c WHERE a.staff_ID=c.staff and b.service_ID=c.service and b.service_name='%s' and c.booking_time LIKE '%s%%'"%(service,today.strftime('%Y-%m-%d'))
@@ -990,9 +1073,9 @@ def POS_service():
             if j==i:
                 staff.remove(i)
     session['POS_staff']=staff
-    session['POS_service']=service
-    print(staff)
-    return redirect(url_for('POS', service=service))
+    session['POS_remark']=remark
+    print(remark)
+    return redirect(url_for('POS', remark=remark))
 
 @app.route("/POS_staff", methods=['POST'])
 def POS_staff():
@@ -1047,11 +1130,17 @@ def POS_member():
                 seat=session['POS_seat']
                 staff=session['POS_staff']
                 service=session['POS_service']
+                remark=session['POS_remark']
                 now=datetime.now()
                 sql="SELECT a.price, c.price, b.seat FROM service a, timetable b, staff c WHERE a.service_ID=b.service and c.staff_ID=b.staff and a.service_name='%s' and a.staff_name='%s'"%(service,staff)
                 cursor.execute(sql)
                 result=cursor.fetchone()
-                price=(result[0] +result[1])/i[2]
+                price=(result[0] +result[1])*i[2]
+                if remark != "None":
+                    sql="SELECT a.price, b.service_name FROM remark a, service b WHERE a.remark_name='%s' and a.service=b.service_ID and b.service_name='%s'"%(remark,service)
+                    cursor.execute(sql)
+                    result1=cursor.fetchone()
+                    price=(result[0] +result[1] +result1[0])*i[2]
                 session['POS_price']=price
                 member=i[0]
                 session['POS_member']=member
@@ -1063,6 +1152,7 @@ def POS_member():
         seat=session['POS_seat']
         staff=session['POS_staff']
         service=session['POS_service']
+        remark=session['POS_remark']
         now=datetime.now()
         sql="SELECT price, service_ID FROM service WHERE service_name='%s'"%service
         cursor.execute(sql)
@@ -1071,6 +1161,11 @@ def POS_member():
         cursor.execute(sql)
         result1=cursor.fetchone()
         price=result[0] +result1[0]
+        if remark != "None":
+            sql="SELECT a.price, b.service_name FROM remark a, service b WHERE a.remark_name='%s' and a.service=b.service_ID and b.service_name='%s'"%(remark,service)
+            cursor.execute(sql)
+            result2=cursor.fetchone()
+            price=result[0] +result1[0]+result2[0]
         session['POS_price']=price
         return redirect(url_for('POS',member_ID=member_ID))
 
@@ -1080,6 +1175,7 @@ def POS_payment():
     seat = session['POS_seat']
     staff = session['POS_staff']
     service = session['POS_service']
+    remark= session['POS_remark']
     member=session['POS_member']
     sql="SELECT service_ID, service_name FROM service WHERE service_name='%s'"%service
     cursor.execute(sql)
@@ -1088,18 +1184,35 @@ def POS_payment():
     cursor.execute(sql)
     staff_name=cursor.fetchone()
     now=datetime.now()
-    if member == "Y":
-        sql="INSERT INTO timetable (service, staff, booking_time, seat) VALUES ('%s','%s','%s','%s')"%(service_name[0],staff_name[0],now,seat)
-        cursor.execute(sql)
-        db.commit()
-        done="done"
-        return redirect(url_for('POS',payment=payment))
+    if remark=="None":
+        if member == "Y":
+            sql="INSERT INTO timetable (service, staff, booking_time, seat) VALUES ('%s','%s','%s','%s')"%(service_name[0],staff_name[0],now,seat)
+            cursor.execute(sql)
+            db.commit()
+            done="done"
+            return redirect(url_for('POS',payment=payment))
+        else:
+            sql="INSERT INTO timetable (service, staff, booking_time, seat, member) VALUES ('%s','%s','%s','%s','%s')"%(service_name[0],staff_name[0],now,seat,member)
+            cursor.execute(sql)
+            db.commit()
+            done="done"
+            return redirect(url_for('POS',payment=payment))
     else:
-        sql="INSERT INTO timetable (service, staff, booking_time, seat, member) VALUES ('%s','%s','%s','%s','%s')"%(service_name[0],staff_name[0],now,seat,member)
+        sql="SELECT a.remark_ID, b.service_name FROM remark a, service b WHERE a.remark_name='%s' and a.service=b.service_ID and b.service_name='%s'"%(remark,service)
         cursor.execute(sql)
-        db.commit()
-        done="done"
-        return redirect(url_for('POS',payment=payment))
+        remark_name=cursor.fetchone()
+        if member == "Y":
+            sql="INSERT INTO timetable (service, staff, booking_time, seat, remark) VALUES ('%s','%s','%s','%s','%s')"%(service_name[0],staff_name[0],now,seat, remark_name[0])
+            cursor.execute(sql)
+            db.commit()
+            done="done"
+            return redirect(url_for('POS',payment=payment))
+        else:
+            sql="INSERT INTO timetable (service, staff, booking_time, seat, member, remark) VALUES ('%s','%s','%s','%s','%s')"%(service_name[0],staff_name[0],now,seat,member, remark_name[0])
+            cursor.execute(sql)
+            db.commit()
+            done="done"
+            return redirect(url_for('POS',payment=payment))
 
 @app.route("/POS_cancel", methods=['POST'])
 def POS_cancel():

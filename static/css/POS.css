@@ -1,3 +1,6 @@
+body{
+    background-color: lightblue;
+}
 .done {
     z-index: 1;
     height: 100%;
@@ -26,12 +29,49 @@ div {
     margin-right: auto;
     text-align: center;
 }
-
+.remark form select{
+    margin-top: 100px;
+    margin-bottom: 200px;
+    width: 80%;
+    height: 50px;
+}
+.Next{
+    margin-bottom: 50px;
+    width: 80%;
+    height: 50px;
+    background-color: lime;
+}
+.member form input{
+    margin-bottom: 3px;
+}
+.members{
+    width: 80%;
+    height: 50px;
+    background-color: lime;
+    margin-top: 200px;
+}
+.skip{
+    width: 80%;
+    height: 50px;
+    background-color: mediumvioletred;
+}
 div button{
     background-color: white;
     border: wheat;
     margin-bottom: 10px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+.pay{
+    width: 80%;
+    height: 50px;
+    background-color: lime;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+.Done{
+    width: 80%;
+    height: 100px;
+    background-color: lime;
 }
 
 div button:hover{
