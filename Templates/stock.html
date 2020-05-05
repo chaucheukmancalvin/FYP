@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{
+    url_for('static', filename='css/stock.css')}}">
+{% endblock %}
+{% block body %}
+<p>stock</p>
+<div>
+    <p class="mes">{{mes}}</p>
+    <ul class="stock">
+        <li>
+            product
+        </li>
+        <li>
+            price($/bottle)
+        </li>
+        <li>
+            capacity(ml/bottle)
+        </li>
+        <li>
+            total stock(ml)
+        </li>
+        <li>
+            total estimate use(ml)
+        </li>
+        <li>
+            total estimate remain(ml)
+        </li>
+        <li>
+            update
+        </li>
+        <li>
+            state
+        </li>
+    </ul>
+    {% for i in stock_number %}
+    <ul class="details">
+        <li>
+            {{i[0]}}
+        </li>
+        <li>
+            ${{i[1]}}
+        </li>
+        <li>
+            {{i[2]}}
+        </li>
+        <li>
+            {{i[3]}}
+        </li>
+        <li>
+            {{i[4]}}
+        </li>
+        <li>
+            {{i[5]}}
+        </li>
+        <li>
+            <button onclick="showupdate({{ loop.index -1 }})">update</button>
+            <div class="update">
+            <button class="close" onclick="closeupdate({{ loop.index -1 }})">X</button>
+            <form action="/stock_update" method="POST">
+                <input type="hidden" name="product" value={{i[0]}}>
+                <p>product: {{i[0]}}</p>
+                <input type="number" name="product_number" placeholder="product stock amount:">
+                <input type="submit" value="update">
+            </form>
+            </div>
+        </li>
+        <li>
+            {{i[6]}}
+        </li>
+    </ul>
+    {% endfor %}
+</div>
+<script>
+    var x = document.getElementsByClassName("update")
+    function showupdate(n){
+        x[n].style.display="block"
+    }
+    function closeupdate(n){
+        x[n].style.display="none"
+    }
+</script>
+{% endblock %}

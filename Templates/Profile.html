@@ -6,29 +6,41 @@
 {% block body %}
 <h1>Profile</h1>
 <div class="profile">
+    <p class="message">{{message}}</p><br>
     <p>user ID:{{member[0]}}</p><br>
     <p>username:{{member[1]}}</p><br>
-    <button onclick="showchangename()">change username</button><br><button onclick="showchangepassword()">change password</button><br>
+    <button class="but" onclick="showchangename()">change username</button><br>
+    <button class="but" onclick="showchangepassword()">change password</button><br>
    <p>membership:{{member[2]}}</p><br>
-   <p><img src="{{url_for('static', filename='img/profile'+ member[0]|string +'.'+ img|string )}}" alt="member[0]"></p><button onclick="showchangeimg()">change image</button><br>
-    <form action="/changemember_name" method="POST" class="changename">
-        <button onclick="closename()">X</button>
+   <p><img src="{{url_for('static', filename='img/profile'+ member[0]|string +'.'+ img|string )}}" alt="member[0]"></p>
+   <button class="but "onclick="showchangeimg()">change image</button><br>
+   <div class="changename">
+   <button class="cancel" onclick="closename()">X</button>
+    <form action="/changemember_name" method="POST">
+        <p>change name</p>
         <input name="username" placeholder="new username" type="text">
-        <input type="submit" value="change">
+        <input class="change" type="submit" value="change">
     </form>
+    </div>
     <br>
-    <form action="/changemember_password" method="POST" class="changepassword">
-        <button onclick="closepassword()">X</button>
+    <div class="changepassword">
+    <button class="cancel" onclick="closepassword()">X</button>
+    <form action="/changemember_password" method="POST">
+        <p>change password</p>
         <input name="old_password" placeholder="old password" type="password">
         <input name="new_password" placeholder="new password" type="password">
-        <input type="submit" value="change">
+        <input class="change" type="submit" value="change">
     </form>
+    </div>
     <br>
-    <form action="/changeprofile_img" method="POST" enctype="multipart/form-data" class="changeimg">
-        <button onclick="closeimg()">X</button>
+    <div class="changeimg">
+    <button class="cancel" onclick="closeimg()">X</button>
+    <form action="/changeprofile_img" method="POST" enctype="multipart/form-data">
+        <p>change image</p>
         <input name="image" type="file">
-        <input type="submit" value="change">
+        <input class="change"type="submit" value="change">
     </form>
+    </div>
 </div>
 <script>
     var x = document.getElementsByClassName("changename");

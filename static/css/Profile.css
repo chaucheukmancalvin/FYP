@@ -1,5 +1,7 @@
 .changename, .changeimg, .changepassword {
     display: none;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 h1{
@@ -22,9 +24,47 @@ h1{
     padding: 10px 10px 10px 10px;
 }
 
-.profile button {
+.but {
     background-color: aqua;
     text-align: center;
     width: 20%;
     border: solid;
+    margin-bottom: 5px;
+}
+
+.cancel{
+    position: fixed;
+    top: 20%;
+    background-color: red;
+    text-align: center;
+    width: 2%;
+    border: solid;
+    margin-bottom: 5px;
+    z-index: 3;
+    
+}
+
+.changename form, .changeimg form, .changepassword form{
+    border: solid;
+    z-index: 2;
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    background-color: white;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+
+.changename form input, .changeimg form input, .changepassword form input{
+    margin-top:100px;
+    margin-bottom: 100px;
+    padding: 3px,3px,3px,3px;
+}
+
+.change{
+    background-color: lime;
+}
+
+.message{
+    color: red;
 }

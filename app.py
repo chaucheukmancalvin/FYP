@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, request, session
+from flask import Flask, render_template, url_for, redirect, request, session, send_file
 import os
 import MySQLdb
 from datetime import datetime, timedelta
@@ -46,6 +46,30 @@ def index():
     sql3="SELECT staff_name FROM staff"
     cursor.execute(sql3)
     staff=cursor.fetchall()
+    work=[]
+    for j in staff:
+        today_month = datetime.strftime(datetime.today(), '%m')
+        today_month_eng = datetime.strftime(datetime.today(), '%B')
+        today_year = datetime.strftime(datetime.today(), '%Y')
+        firstday_week = datetime.strptime(str(today_year)+'-'+str(today_month)+'-'+'01', '%Y-%m-%d').weekday()
+        today_month_days = int(calendar.monthrange(int(today_year), int(today_month))[1])
+        days = []
+        seperator='-'
+        while int(firstday_week) > 0:
+            days.append(['',''])
+            firstday_week = int(firstday_week)-1
+        for i in range(1,today_month_days+1):
+            dates = (str(today_year),str(today_month),str(i))
+            date = datetime.strptime(seperator.join(dates), '%Y-%m-%d')
+            week = date.strftime('%a').upper()
+            sql="SELECT a.week, b.staff_name FROM working_week a, staff b WHERE a.staff=b.staff_ID and b.staff_name='%s'and a.week='%s'"%(j[0],week)
+            cursor.execute(sql)
+            work_detail=cursor.fetchone()
+            work_day='workday'
+            if work_detail==None:
+                work_day='nonworkday'
+            days.append([i,work_day])
+        work.append([j[0],days])
     if session.get('member'):
         sql1="SELECT member_name FROM member WHERE member_ID='%s'"%session['member']
         cursor.execute(sql1)
@@ -54,8 +78,8 @@ def index():
         sql3="SELECT booking_time FROM timetable WHERE member='%s' and booking_time >='%s' ORDER BY booking_time ASC"%(session['member'], datetime.today())
         cursor.execute(sql3)
         upcome_booking=cursor.fetchone()
-        return render_template('index.html',service=category, member=member, servicedetails=details, staff=staff, upcome_booking=upcome_booking)
-    return render_template('index.html',service=category, servicedetails=details, staff=staff)
+        return render_template('index.html',service=category, member=member, servicedetails=details, work=work, upcome_booking=upcome_booking, month=today_month_eng, year=today_year)
+    return render_template('index.html',service=category, servicedetails=details, work=work, month=today_month_eng, year=today_year)
 
 @app.route("/aboutus")
 def aboutus():
@@ -65,8 +89,93 @@ def aboutus():
 def advertisement():
     return render_template('advertisement.html')
 
+@app.route("/stock")
+def stock():
+    mes=''
+    if session.get('stock_mes'):
+        mes=session['stock_mes']
+        session.pop('stock_mes',None)
+    sql="SELECT a.product_name, a.price, a.capacity_ml, b.product_number FROM product a, stock b WHERE a.product_ID=b.product"
+    cursor.execute(sql)
+    stock_detail=cursor.fetchall()
+    sql="SELECT a.product_name, b.estimate_usage, c.remark_name, c.remark_ID , d.service_name, d.service_ID FROM product a, product_usage b, remark c, service d WHERE a.product_ID=b.product and c.remark_ID=b.remark and d.service_ID=b.service"
+    cursor.execute(sql)
+    usage=cursor.fetchall()
+    sql="SELECT a.booking_time, b.service_name, c.remark_name, c.remark_ID, b.service_ID FROM timetable a, service b, remark c WHERE a.service=b.service_ID and a.remark=c.remark_ID"
+    cursor.execute(sql)
+    service_total=cursor.fetchall()
+    sql="SELECT a.product_name, b.estimate_usage, c.service_name, c.service_ID FROM product a, product_usage b, service c WHERE a.product_ID=b.product and c.service_ID=b.service and b.remark IS NULL"
+    cursor.execute(sql)
+    usage_nonremark=cursor.fetchall()
+    sql="SELECT a.booking_time, b.service_name, b.service_ID FROM timetable a, service b WHERE a.service=b.service_ID and a.remark IS NULL"
+    cursor.execute(sql)
+    service_total_nonremark=cursor.fetchall()
+    today=datetime.today()
+    service_not_done=[]
+    service_not_done_nonremark=[]
+    stock_number=[]
+    stock_usage=[]
+    for j in service_total:
+        if j[0]>today:
+            service_not_done.append(j)
+    for i in service_total_nonremark:
+        if i[0]>today:
+            service_not_done_nonremark.append(i)
+    for k in service_not_done:
+        for l in usage:
+            if k[3]==l[3] and k[4]==l[5]:
+                stock_usage.append([l[0],l[1]])
+        for o in usage_nonremark:
+            if k[4]==o[3]:
+                stock_usage.append([o[0],o[1]])
+    for n in service_not_done_nonremark:
+        for p in usage_nonremark:
+            if n[2]==p[3]:
+                stock_usage.append([p[0],p[1]])
+    for m in stock_detail:
+        stock_total=m[2]*m[3]
+        use=0
+        for q in stock_usage:
+            if q[0]==m[0]:
+                use+=q[1]
+        stock_remain=stock_total-use
+        message='OK'
+        if stock_remain <=0:
+            message="stock not enough"
+        st=[m[0],m[1],m[2],stock_total,use,stock_remain,message]
+        stock_number.append(st)
+    return render_template('stock.html',stock_number=stock_number,mes=mes)
+
+@app.route("/stock_update", methods=['POST'])
+def stock_update():
+    product=request.form['product']
+    product_number=request.form['product_number']
+    sql="SELECT product_ID FROM product WHERE product_name='%s'"%product
+    cursor.execute(sql)
+    product_ID=cursor.fetchone()
+    try:
+        if product_number >0:
+            sql="UPDATE stock SET product_number='%s' WHERE product='%s'"%(product_number,product_ID[0])
+            cursor.execute(sql)
+            db.commit()
+        else:
+            mes="*product stock amount should greater that 0 and in integer"
+            session['stock_mes']=mes
+        return redirect(url_for('stock'))
+    except:
+        mes="*product stock amount should greater that 0 and in integer"
+        session['stock_mes']=mes
+        return redirect(url_for('stock'))
+
 @app.route("/Profile")
 def Profile():
+    try:
+        message=request.args['message']
+        message=session['Profile_message']
+        session.pop('Profile_message',None)
+    except:
+        message=''
+        pass
     member_id = session['member']
     sql="SELECT a.member_ID, a.member_name, b.membership_name FROM member a, membership b WHERE a.membership = b.membership_ID and a.member_ID='%s'"%member_id
     cursor.execute(sql)
@@ -75,29 +184,35 @@ def Profile():
        img = open('static/img/' + 'profile' +str(member_id)  + '.' + 'png')
        img.close()
        img = 'png'
-       return render_template('Profile.html', member=member, img=img)
+       return render_template('Profile.html', member=member, img=img, message=message)
     except:
         try:
             img = open('static/img/' + 'profile' + str(member_id)  + '.' + 'jpg')
-            img.colse()
+            img.close()
             img = 'jpg'
-            return render_template('Profile.html', member=member, img=img)
+            return render_template('Profile.html', member=member, img=img, message=message)
         except:
             try:
                 img = open('static/img/' + 'profile' +str(member_id)  + '.' + 'jpeg')
-                img.colse()
+                img.close()
                 img = 'jpeg'
-                return render_template('Profile.html', member=member, img=img)
+                return render_template('Profile.html', member=member, img=img, message=message)
             except:
-                return render_template('Profile.html', member=member)
+                return render_template('Profile.html', member=member, message=message)
 
 @app.route("/changemember_name", methods=['POST'])
 def changemember_name():
     member_id = session['member']
     member_new_name = request.form['username']
+    if member_new_name == '':
+        message="*new name not filled"
+        session['Profile_message']=message
+        return redirect(url_for('Profile',message=message))
     sql="UPDATE member SET member_name = '%s' WHERE member_ID = '%s'"%(member_new_name, member_id)
     cursor.execute(sql)
     db.commit()
+    message="name have been changed"
+    session['Profile_message']=message
     return redirect(url_for('Profile'))
 
 @app.route("/changemember_password", methods=['POST'])
@@ -108,11 +223,16 @@ def changemember_passsword():
     sql="SELECT * FROM member WHERE member_ID = '%s' and password = '%s'"%(member_id, member_old_password)
     cursor.execute(sql)
     member=cursor.fetchone()
-    if member != ():
+    if member != None:
         sql="UPDATE member SET password = '%s' WHERE member_ID = '%s'"%(member_new_password, member_id)
         cursor.execute(sql)
         db.commit()
-    return redirect(url_for('Profile'))
+        message="change password success"
+        session['Profile_message']=message
+    else:
+        message="*member id or password wrong"
+        session['Profile_message']=message
+    return redirect(url_for('Profile',message=message))
 
 @app.route("/changeprofile_img", methods=['POST'])
 def changeprofile_img():
@@ -861,56 +981,78 @@ def nomalmembership():
     member_name = request.form['member_name']
     password = request.form['password']
     confirmpassword = request.form['confirmpassword']
-    if password == confirmpassword:
-        sql="SELECT member_ID FROM member ORDER BY member_ID DESC"
-        cursor.execute(sql)
-        member_ID=cursor.fetchone()
-        member_ID=member_ID[0]
-        member_ID=int(member_ID[1]+member_ID[2]+member_ID[3]+member_ID[4]+member_ID[5]+member_ID[6]+member_ID[7])+1
-        seperator=''
-        lists=[]
-        for i in str(member_ID):
-            lists.append(i)
-        while len(lists) < 7:
-            lists.insert(0,'0')
-        lists.insert(0,'M')
-        member_ID=seperator.join(lists)
-        sql="INSERT INTO member (member_ID, member_name, password, membership) VALUES (%s, %s, %s, %s)"
-        val=(member_ID, member_name, password, '1')
-        cursor.execute(sql,val)
-        db.commit()
-        message="success registor"
+    email=request.form['email']
+    if member_name=='':
+        message="member name not filled"
+        return redirect(url_for('membership', message=message))
+    if password=='':
+        message="password not filled"
+        return redirect(url_for('membership', message=message))
     else:
-        message="password not same"
-    return redirect(url_for('membership', message=message))
+        if re.match("[^@]+@[^@]+\.[^@]+", email):
+            if password == confirmpassword:
+                sql="SELECT member_ID FROM member ORDER BY member_ID DESC"
+                cursor.execute(sql)
+                member_ID=cursor.fetchone()
+                member_ID=member_ID[0]
+                member_ID=int(member_ID[1]+member_ID[2]+member_ID[3]+member_ID[4]+member_ID[5]+member_ID[6]+member_ID[7])+1
+                seperator=''
+                lists=[]
+                for i in str(member_ID):
+                    lists.append(i)
+                while len(lists) < 7:
+                    lists.insert(0,'0')
+                lists.insert(0,'M')
+                member_ID=seperator.join(lists)
+                sql="INSERT INTO member (member_ID, member_name, password, membership) VALUES (%s, %s, %s, %s)"
+                val=(member_ID, member_name, password, '1')
+                cursor.execute(sql,val)
+                db.commit()
+                msg = Message('Register from salon.',sender='205project2019@gmail.com',recipients=[str(email)])
+                msg.body = "Hello " + str(member_name) +". "+"You have register nomal member of our salon" + ". " + "Your member ID is " + str(member_ID)
+                mail.send(msg)
+                message="success registor"
+            else:
+                message="password not same"
+            return redirect(url_for('membership', message=message))
+        else:
+            message="wrong email format"
+            return redirect(url_for('membership', message=message))
 
 @app.route("/VIPmembership", methods=['POST'])
 def VIPmembership():
     member_ID = request.form['member_ID']
     password = request.form['password']
     confirmpassword = request.form['confirmpassword']
-    if password == confirmpassword:
-        sql="SELECT * FROM member WHERE member_ID='%s' and password='%s'"%(member_ID,password)
-        cursor.execute(sql)
-        result=cursor.fetchone()
-        if result != None:
-            sql2="SELECT * FROM timetable WHERE member = '%s'"%member_ID
-            cursor.execute(sql2)
-            record = cursor.fetchall()
-            count=0
-            for i in record:
-                count+=1
-            if count <= 10:
-                sql="UPDATE member SET membership='2' WHERE member_ID='%s' and password='%s'"%(member_ID,password)
-                cursor.execute(sql)
-                db.commit()
-                mes="upgrade success"
+    email=request.form['email']
+    if re.match("[^@]+@[^@]+\.[^@]+", email):
+        if password == confirmpassword:
+            sql="SELECT * FROM member WHERE member_ID='%s' and password='%s'"%(member_ID,password)
+            cursor.execute(sql)
+            result=cursor.fetchone()
+            if result != None:
+                sql2="SELECT * FROM timetable WHERE member = '%s'"%member_ID
+                cursor.execute(sql2)
+                record = cursor.fetchall()
+                count=0
+                for i in record:
+                    count+=1
+                if count <= 10:
+                    sql="UPDATE member SET membership='2' WHERE member_ID='%s' and password='%s'"%(member_ID,password)
+                    cursor.execute(sql)
+                    db.commit()
+                    msg = Message('Member upgrade from salon.',sender='205project2019@gmail.com',recipients=[str(email)])
+                    msg.body = "Hello " + str(result[1]) +". "+"You have upgrade nomal member to VIP member of our salon that your member ID is " + str(member_ID)
+                    mail.send(msg)
+                    mes="upgrade success"
+                else:
+                    mes="requirement not enougth to upgrade"
             else:
-                mes="requirement not enougth to upgrade"
+                mes="wrong password or userID"
         else:
-            mes="wrong password or userID"
+            mes="password not same"
     else:
-        mes="password not same"
+        mes="email format wrong"
     return redirect(url_for('membership',mes=mes))
 
 @app.route("/POS")
@@ -1218,5 +1360,11 @@ def POS_payment():
 def POS_cancel():
     return redirect(url_for('POS'))
 
+@app.route("/.well-known/acme-challenge/WIk5dR6WGaU0bQbcwkN3hXl-t4sdCA_noKisp7uhDYM")
+def SSL():
+    return send_file('C:/Users/chauc/Desktop/Final_project/WIk5dR6WGaU0bQbcwkN3hXl-t4sdCA_noKisp7uhDYM')
+
 if __name__ == "__main__":
-    app.run(host='192.168.1.3', port='80', debug=True)
+    cer = os.path.dirname(os.path.realpath(__file__))+"/sslforfree/certificate.crt"
+    key = os.path.dirname(os.path.realpath(__file__))+"/sslforfree/private.key"
+    app.run(host='192.168.1.6', port='443', debug=True, ssl_context=(cer, key))

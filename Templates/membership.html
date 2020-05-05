@@ -16,19 +16,23 @@
     <form action="/nomalmembership" method="POST">
         <input type="text" name="member_name" placeholder="username:">
         <input type="password" name="password" placeholder="password:">
-        <input type="password" name="confirmpassword" placeholder="confirm password:">
+		<input type="password" name="confirmpassword" placeholder="confirm password:">
+		<input type="email" name="email" placeholder="email:">
         <button type="submit">Registor</button>
     </form>
-    <p>{{message}}</p>
+	<p>{{message}}</p>
+	<p>{{mes}}</p>
 </div>
 <div class="membership">
 	<form action="/VIPmembership" method="POST">
 		<h2>Upgrade From nomal member to VIP member</h2>
         <input type="text" name="member_ID" placeholder="userID:">
         <input type="password" name="password" placeholder="password:">
-        <input type="password" name="confirmpassword" placeholder="confirm password:">
+		<input type="password" name="confirmpassword" placeholder="confirm password:">
+		<input type="email" name="email" placeholder="email:">
         <button type="submit">Upgrade</button>
-    </form>
+	</form>
+	<p>{{message}}</p>
     <p>{{mes}}</p>
 </div>
 <script>
